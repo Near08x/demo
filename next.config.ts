@@ -1,6 +1,9 @@
-import type { NextConfig } from 'next';
+﻿import type { NextConfig } from 'next';
 import withPWAInit from 'next-pwa';
 import bundleAnalyzer from '@next/bundle-analyzer';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./i18n.ts');
 
 const withPWA = withPWAInit({
   dest: 'public',
@@ -12,18 +15,26 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
-// 🚀 CSP totalmente permisiva (bypass completo)
-const openCSP = `
-  default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
-  script-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
-  script-src-elem * 'unsafe-inline' 'unsafe-eval' data: blob:;
-  style-src * 'unsafe-inline' 'unsafe-eval' data:;
-  style-src-elem * 'unsafe-inline' 'unsafe-eval' data:;
-  img-src * data: blob:;
-  connect-src *;
-  font-src * data:;
-  frame-src *;
-`;
+// Restrictive CSP for production, permissive for development
+const csp = process.env.NODE_ENV === 'production' 
+  ? `
+      default-src 'self';
+      script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: https: blob:;
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://pgslaycjbnijwducaore.supabase.co https://api.supabase.co;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+    `
+  : `
+      default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
+      script-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
+      style-src * 'unsafe-inline' 'unsafe-eval' data:;
+      img-src * data: blob:;
+      connect-src *;
+    `;
 
 const nextConfig: NextConfig = {
   output: 'standalone',
@@ -33,7 +44,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: process.env.NODE_ENV === 'production',
   },
-  // Permitir que el build continúe sin variables de entorno en build time
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
@@ -46,21 +56,17 @@ const nextConfig: NextConfig = {
     ],
   },
 
-
-  // � Optimizaciones de rendimiento - Fase 1
   compiler: {
-    // Remover console.log en producción
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn'],
     } : false,
   },
 
   experimental: {
-    // Optimizar imports de paquetes grandes
     optimizePackageImports: ['recharts', 'lucide-react', 'date-fns'],
   },
 
-  // �🔓 CORS + CSP sin restricciones
+  // Security headers
   async headers() {
     return [
       {
@@ -68,19 +74,42 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: openCSP.replace(/\n/g, ' '),
+            value: csp.replace(/\n/g, ' ').trim(),
           },
           {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS',
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
           {
-            key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization, X-Requested-With',
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'geolocation=(), microphone=(), camera=(), payment=()',
+          },
+          // Only for HTTPS in production
+          ...(process.env.NODE_ENV === 'production' ? [{
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          }] : []),
+        ],
+      },
+      // Auth routes - stricter security
+      {
+        source: '/api/auth/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
           },
         ],
       },
@@ -88,4 +117,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(withPWA(nextConfig));
+export default withNextIntl(withBundleAnalyzer(withPWA(nextConfig)));

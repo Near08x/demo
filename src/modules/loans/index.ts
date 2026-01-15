@@ -1,7 +1,7 @@
 /**
  * Loans Module - Index
  * 
- * Módulo refactorizado de préstamos con arquitectura modular
+ * Refactored loans module with modular architecture
  * Exporta solo la API pública del módulo (service y calculator)
  * Repository es interno y no se expone
  */

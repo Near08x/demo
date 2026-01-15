@@ -136,7 +136,7 @@ export function calculateInstallments(
 ): InstallmentCalculation[] {
   const installments: InstallmentCalculation[] = [];
   
-  // Calcular interés por cuota
+  // Calculate interest per installment
   const periodsPerYear = getPeriodsPerYear(loanType);
   const interestPerPeriod = (interestRate / 100) / periodsPerYear;
   const totalInterest = principal * interestPerPeriod * loanTerm;
@@ -175,7 +175,8 @@ export function calculateInstallments(
  * ```
  */
 function calculateDueDate(startDate: string, installmentNumber: number, loanType: string): string {
-  switch (loanType.toLowerCase()) {
+  const type = (loanType || 'Mensual').toLowerCase();
+  switch (type) {
     case 'mensual':
       return addMonths(startDate, installmentNumber);
     case 'quincenal':
@@ -204,7 +205,8 @@ function calculateDueDate(startDate: string, installmentNumber: number, loanType
  * ```
  */
 function getPeriodsPerYear(loanType: string): number {
-  switch (loanType.toLowerCase()) {
+  const type = (loanType || 'Mensual').toLowerCase();
+  switch (type) {
     case 'mensual':
       return 12;
     case 'quincenal':
@@ -219,13 +221,13 @@ function getPeriodsPerYear(loanType: string): number {
 }
 
 // =========================
-//    VALIDACIÓN DE ESTADO
+//    STATUS VALIDATION
 // =========================
 
 /**
- * Verifica si una cuota está completamente pagada
+ * Verifies if an installment is fully paid
  * 
- * @param installment - Cuota a verificar
+ * @param installment - Installment to verify
  * @returns true si la cuota está pagada (paidAmount >= total), false en caso contrario
  * 
  * @example

@@ -23,38 +23,38 @@ export default function DashboardClient({
     <div className="flex flex-col gap-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <SummaryCard
-          title="Ingresos Totales"
-          value={`$${totalRevenue.toLocaleString('es-ES', {
+          title="Total Revenue"
+          value={`$${totalRevenue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`}
           icon={DollarSign}
-          description="+20.1% desde el mes pasado"
+          description="+20.1% from last month"
         />
         <SummaryCard
-          title="Ventas"
+          title="Sales"
           value={`+${totalSales}`}
           icon={CreditCard}
-          description="+180.1% desde el mes pasado"
+          description="+180.1% from last month"
         />
         <SummaryCard
-          title="Poco Stock"
-          value={`${lowStockItems} Artículos`}
+          title="Low Stock"
+          value={`${lowStockItems}`}
           icon={Package}
-          description="Alertas para artículos que necesitan reabastecimiento"
+          description={lowStockItems === 1 ? '1 item needs restocking' : `${lowStockItems} items need restocking`}
           variant="destructive"
         />
         <SummaryCard
-          title="Productos Totales"
+          title="Total Products"
           value={totalProducts}
           icon={Package}
-          description="Número actual de productos únicos"
+          description="Current number of unique products"
         />
       </div>
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Ventas Recientes</CardTitle>
+            <CardTitle>Recent Sales</CardTitle>
           </CardHeader>
           <CardContent>
             <RecentSales sales={sales} />
@@ -62,7 +62,7 @@ export default function DashboardClient({
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Clientes Recientes</CardTitle>
+            <CardTitle>Recent Clients</CardTitle>
           </CardHeader>
           <CardContent>
             <RecentClients sales={sales} />

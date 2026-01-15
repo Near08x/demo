@@ -1,3 +1,5 @@
+export const revalidate = 300; // Revalidar cada 5 minutos (productos cambian menos frecuente)
+
 import MainLayout from '@/components/main-layout';
 import PosClient from '@/components/pos/pos-client';
 import type { Product } from '@/lib/types';

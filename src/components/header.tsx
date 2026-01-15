@@ -4,17 +4,17 @@ import { UserNav } from '@/components/user-nav';
 import { usePathname } from 'next/navigation';
 
 const getTitleFromPathname = (pathname: string): string => {
-  if (pathname === '/') return 'Tablero';
+  if (pathname === '/') return 'Dashboard';
 
   const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') ?? '';
 
   const titles: { [key: string]: string } = {
     pos: 'POS',
-    inventory: 'Inventario',
-    clients: 'Clientes',
-    finance: 'Finanzas',
-    loans: 'Gestión de Préstamos',
-    settings: 'Configuración',
+    inventory: 'Inventory',
+    clients: 'Clients',
+    finance: 'Finance',
+    loans: 'Loan Management',
+    settings: 'Settings',
   };
 
   const title = titles[routeName] || (routeName.charAt(0).toUpperCase() + routeName.slice(1));

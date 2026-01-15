@@ -83,15 +83,15 @@ type TimeRange = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'all';
 
 const chartConfig = {
   revenue: {
-    label: 'Ingresos',
+    label: 'Revenue',
     color: 'hsl(var(--chart-1))',
   },
   profit: {
-    label: 'Ganancia',
+    label: 'Profit',
     color: 'hsl(var(--chart-2))',
   },
   spending: {
-    label: 'Gasto',
+    label: 'Spending',
     color: 'hsl(var(--chart-1))',
   },
 } satisfies ChartConfig;
@@ -164,8 +164,8 @@ export default function FinanceDashboard({
     totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
 
   // Build time-range aware chart data
-  const monthNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const weekDays = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const weekDays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const now = new Date();
 
   let chartData: ChartPoint[] = [];
@@ -254,7 +254,9 @@ export default function FinanceDashboard({
   ];
 
   // Obtener lista única de proveedores (todos)
-  const providers = Array.from(new Set(products.map((p) => p.provider))).sort();
+  const providers = Array.from(
+    new Set(products.map((p) => p.provider).filter((p): p is string => !!p))
+  ).sort();
 
   // Calcular ventas y márgenes reales por producto/proveedor en el periodo
   const salesByProduct = new Map<string, { revenue: number; cost: number; provider: string; name: string }>();
@@ -314,13 +316,13 @@ export default function FinanceDashboard({
 
   const getTimeRangeLabel = () => {
     switch (timeRange) {
-      case 'day': return 'Hoy';
-      case 'week': return 'Esta semana';
-      case 'month': return 'Este mes';
-      case 'quarter': return 'Este trimestre';
-      case 'year': return 'Este año';
-      case 'all': return 'Desde siempre';
-      default: return 'Todos';
+      case 'day': return 'Today';
+      case 'week': return 'This week';
+      case 'month': return 'This month';
+      case 'quarter': return 'This quarter';
+      case 'year': return 'This year';
+      case 'all': return 'All time';
+      default: return 'All';
     }
   };
 
@@ -334,30 +336,30 @@ export default function FinanceDashboard({
       // Encabezado
       pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Reporte Financiero', pageWidth / 2, yPos, { align: 'center' });
+      pdf.text('Financial Report', pageWidth / 2, yPos, { align: 'center' });
       
       yPos += 8;
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(`Periodo: ${getTimeRangeLabel()}`, pageWidth / 2, yPos, { align: 'center' });
-      pdf.text(`Fecha: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: es })}`, pageWidth / 2, yPos + 6, { align: 'center' });
+      pdf.text(`Period: ${getTimeRangeLabel()}`, pageWidth / 2, yPos, { align: 'center' });
+      pdf.text(`Date: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: es })}`, pageWidth / 2, yPos + 6, { align: 'center' });
       
       yPos += 20;
 
       // Resumen de métricas
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Resumen Ejecutivo', 14, yPos);
+      pdf.text('Executive Summary', 14, yPos);
       yPos += 8;
 
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       const metrics = [
-        ['Ingresos Totales:', `$${totalRevenue.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
-        ['Ganancia Total:', `$${totalProfit.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
-        ['Margen Promedio:', `${averageProfitMargin.toFixed(2)}%`],
+        ['Total Revenue:', `$${totalRevenue.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
+        ['Total Profit:', `$${totalProfit.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
+        ['Average Margin:', `${averageProfitMargin.toFixed(2)}%`],
         ['ITBIS (18%):', `$${totalTax.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
-        ['Costo Inventario:', `$${providerSpending.reduce((acc, p) => acc + p.spending, 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
+        ['Inventory Cost:', `$${providerSpending.reduce((acc, p) => acc + p.spending, 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
       ];
 
       metrics.forEach(([label, value]) => {
@@ -371,14 +373,14 @@ export default function FinanceDashboard({
       // Tabla de ventas por periodo
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Detalle de Ventas por Periodo', 14, yPos);
+      pdf.text('Sales Detail by Period', 14, yPos);
       yPos += 8;
 
       pdf.setFontSize(9);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Periodo', 14, yPos);
-      pdf.text('Ingresos', 60, yPos);
-      pdf.text('Ganancia', 100, yPos);
+      pdf.text('Period', 14, yPos);
+      pdf.text('Revenue', 60, yPos);
+      pdf.text('Profit', 100, yPos);
       yPos += 5;
 
       pdf.setFont('helvetica', 'normal');
@@ -402,13 +404,13 @@ export default function FinanceDashboard({
       // Gastos por proveedor (TODOS los proveedores)
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Inventario por Proveedor', 14, yPos);
+      pdf.text('Inventory by Provider', 14, yPos);
       yPos += 8;
 
       pdf.setFontSize(9);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Proveedor', 14, yPos);
-      pdf.text('Costo Inventario', 120, yPos);
+      pdf.text('Provider', 14, yPos);
+      pdf.text('Inventory Cost', 120, yPos);
       pdf.text('% Total', 170, yPos);
       yPos += 5;
 
@@ -431,15 +433,15 @@ export default function FinanceDashboard({
       // Ventas por proveedor en el periodo
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Ventas por Proveedor (Periodo Seleccionado)', 14, yPos);
+      pdf.text('Sales by Provider (Selected Period)', 14, yPos);
       yPos += 8;
 
       pdf.setFontSize(9);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Proveedor', 14, yPos);
-      pdf.text('Ingresos', 90, yPos);
-      pdf.text('Costo', 130, yPos);
-      pdf.text('Ganancia', 170, yPos);
+      pdf.text('Provider', 14, yPos);
+      pdf.text('Revenue', 90, yPos);
+      pdf.text('Cost', 130, yPos);
+      pdf.text('Profit', 170, yPos);
       yPos += 5;
 
       // Calcular ventas por proveedor
@@ -490,8 +492,8 @@ export default function FinanceDashboard({
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="mb-6">
-        <TabsTrigger value="sales">Ventas e Inventario</TabsTrigger>
-        <TabsTrigger value="loans">Préstamos</TabsTrigger>
+        <TabsTrigger value="sales">Sales and Inventory</TabsTrigger>
+        <TabsTrigger value="loans">Loans</TabsTrigger>
       </TabsList>
 
       <TabsContent value="sales">
@@ -499,10 +501,10 @@ export default function FinanceDashboard({
           <div className="flex items-center justify-between no-print">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">
-                Finanzas de POS/Inventario
+                POS/Inventory Finance
               </h2>
               <p className="text-muted-foreground">
-                Análisis de ingresos, costos y ganancias de tus ventas.
+                Analysis of revenue, costs and profits from your sales.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -511,51 +513,51 @@ export default function FinanceDashboard({
                 onValueChange={(value) => setTimeRange(value as TimeRange)}
               >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Seleccionar rango" />
+                  <SelectValue placeholder="Select range" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Desde siempre</SelectItem>
-              <SelectItem value="day">Hoy</SelectItem>
-              <SelectItem value="week">Esta semana</SelectItem>
-              <SelectItem value="month">Este mes</SelectItem>
-              <SelectItem value="quarter">Este trimestre</SelectItem>
-              <SelectItem value="year">Este año</SelectItem>
+              <SelectItem value="all">All time</SelectItem>
+              <SelectItem value="day">Today</SelectItem>
+              <SelectItem value="week">This week</SelectItem>
+              <SelectItem value="month">This month</SelectItem>
+              <SelectItem value="quarter">This quarter</SelectItem>
+              <SelectItem value="year">This year</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={handlePrint} size="sm" variant="outline">
             <Printer className="mr-2 h-4 w-4" />
-            Descargar PDF
+            Download PDF
           </Button>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 print:grid-cols-4">
         <SummaryCard
-          title="Ingresos Totales"
+          title="Total Revenue"
           value={`$${totalRevenue.toLocaleString('es-ES', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`}
           icon={DollarSign}
-          description="Total de ventas (incluye ITBIS)"
+          description="Total sales (includes ITBIS)"
         />
         <SummaryCard
-          title="Ganancia Total"
+          title="Total Profit"
           value={`$${totalProfit.toLocaleString('es-ES', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`}
           icon={TrendingUp}
-          description="Ingresos menos costos de productos"
+          description="Revenue minus product costs"
         />
         <SummaryCard
-          title="Margen de Ganancia Promedio"
+          title="Average Profit Margin"
           value={`${averageProfitMargin.toFixed(2)}%`}
           icon={BarChart}
-          description="Ganancia / Ingresos"
+          description="Profit / Revenue"
         />
         <SummaryCard
-          title="Costo Total de Inventario"
+          title="Total Inventory Cost"
           value={`$${providerSpending
             .reduce((acc, p) => acc + p.spending, 0)
             .toLocaleString('es-ES', {
@@ -563,7 +565,7 @@ export default function FinanceDashboard({
               maximumFractionDigits: 2,
             })}`}
           icon={Package}
-          description="Valor del stock actual"
+          description="Current stock value"
         />
         <SummaryCard
           title="Total ITBIS (18%)"
@@ -572,16 +574,16 @@ export default function FinanceDashboard({
             maximumFractionDigits: 2,
           })}`}
           icon={BarChart}
-          description="Total de impuestos recaudados"
+          description="Total taxes collected"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Ventas por periodo</CardTitle>
+            <CardTitle>Sales by period</CardTitle>
             <CardDescription>
-              Ingresos y ganancias según el rango seleccionado.
+              Revenue and profit according to selected range.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -607,9 +609,9 @@ export default function FinanceDashboard({
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Gastos por Proveedor</CardTitle>
+            <CardTitle>Spending by Provider</CardTitle>
             <CardDescription>
-              Distribución de costos de inventario por proveedor.
+              Distribution of inventory costs by provider.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -645,11 +647,11 @@ export default function FinanceDashboard({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Análisis de Margen de Beneficio {selectedProvider === 'all' ? 'por Proveedor' : 'por Producto'}</CardTitle>
+              <CardTitle>Profit Margin Analysis {selectedProvider === 'all' ? 'by Provider' : 'by Product'}</CardTitle>
               <CardDescription>
                 {selectedProvider === 'all'
-                  ? 'Margen de ganancia promedio por proveedor.'
-                  : 'Productos ordenados por su margen de ganancia.'}
+                  ? 'Average profit margin by provider.'
+                  : 'Products sorted by their profit margin.'}
               </CardDescription>
             </div>
             <Select
@@ -657,10 +659,10 @@ export default function FinanceDashboard({
               onValueChange={setSelectedProvider}
             >
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filtrar por proveedor" />
+                <SelectValue placeholder="Filter by provider" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los proveedores</SelectItem>
+                <SelectItem value="all">All providers</SelectItem>
                 {providers.map((provider) => (
                   <SelectItem key={provider} value={provider}>
                     {provider}
@@ -674,7 +676,7 @@ export default function FinanceDashboard({
           <ChartContainer
             config={{
               profitMargin: {
-                label: 'Margen (%)',
+                label: 'Margin (%)',
                 color: 'hsl(var(--chart-2))',
               },
             }}

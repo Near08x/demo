@@ -55,7 +55,7 @@ function ProductTable({ products, onDeleteProduct, onEditProduct }: ProductTable
   if (products.length === 0) {
     return (
       <div className="py-8 text-center text-muted-foreground">
-        No se encontraron productos.
+        No products found.
       </div>
     );
   }
@@ -64,15 +64,15 @@ function ProductTable({ products, onDeleteProduct, onEditProduct }: ProductTable
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Nombre</TableHead>
-          <TableHead>Estado</TableHead>
-          <TableHead className="hidden md:table-cell">P1 (Ind.)</TableHead>
-          <TableHead className="hidden md:table-cell">P2 (Mayor)</TableHead>
-          <TableHead className="hidden md:table-cell">P3 (Oferta)</TableHead>
-          <TableHead className="hidden md:table-cell">Costo</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="hidden md:table-cell">P1 (Retail)</TableHead>
+          <TableHead className="hidden md:table-cell">P2 (Wholesale)</TableHead>
+          <TableHead className="hidden md:table-cell">P3 (Sale)</TableHead>
+          <TableHead className="hidden md:table-cell">Cost</TableHead>
           <TableHead className="hidden md:table-cell">Stock</TableHead>
           <TableHead>
-            <span className="sr-only">Acciones</span>
+            <span className="sr-only">Actions</span>
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -91,23 +91,23 @@ function ProductTable({ products, onDeleteProduct, onEditProduct }: ProductTable
                 }
               >
                 {product.stock > 10
-                  ? 'En Stock'
+                  ? 'In Stock'
                   : product.stock > 0
-                  ? 'Poco Stock'
-                  : 'Agotado'}
+                  ? 'Low Stock'
+                  : 'Out of Stock'}
               </Badge>
             </TableCell>
             <TableCell className="hidden md:table-cell">
-              ${product.price.toFixed(2)}
+              ${(product.price || 0).toFixed(2)}
             </TableCell>
             <TableCell className="hidden md:table-cell">
-              ${product.price2.toFixed(2)}
+              ${(product.price2 || 0).toFixed(2)}
             </TableCell>
             <TableCell className="hidden md:table-cell">
-              ${product.price3.toFixed(2)}
+              ${(product.price3 || 0).toFixed(2)}
             </TableCell>
             <TableCell className="hidden md:table-cell">
-              ${product.cost.toFixed(2)}
+              ${(product.cost || 0).toFixed(2)}
             </TableCell>
             <TableCell className="hidden md:table-cell">
               {product.stock}
@@ -122,9 +122,9 @@ function ProductTable({ products, onDeleteProduct, onEditProduct }: ProductTable
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => onEditProduct(product)}>Editar</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onDeleteProduct(product.id)}>Eliminar</DropdownMenuItem>
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => onEditProduct(product)}>Edit</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onDeleteProduct(product.id)}>Delete</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
@@ -160,9 +160,9 @@ export default function InventoryClient({
         const addedProduct = await response.json();
         setProducts((prev) => [addedProduct, ...prev]);
         setAddProductOpen(false);
-        toast({ title: 'Éxito', description: 'Producto añadido correctamente.' });
+        toast({ title: 'Success', description: 'Product added successfully.' });
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudo añadir el producto.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not add product.', variant: 'destructive' });
     }
   };
   
@@ -175,9 +175,9 @@ export default function InventoryClient({
         });
         if (!response.ok) throw new Error('Failed to delete product');
         setProducts((prev) => prev.filter((product) => product.id !== id));
-        toast({ title: 'Éxito', description: 'Producto eliminado correctamente.' });
+        toast({ title: 'Success', description: 'Product deleted successfully.' });
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudo eliminar el producto.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not delete product.', variant: 'destructive' });
     }
   }
 
@@ -196,9 +196,9 @@ export default function InventoryClient({
         const returnedProduct = await response.json();
         setProducts(prev => prev.map(p => p.id === returnedProduct.id ? returnedProduct : p));
         setEditingProduct(null);
-        toast({ title: 'Éxito', description: 'Producto actualizado correctamente.' });
+        toast({ title: 'Success', description: 'Product updated successfully.' });
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudo actualizar el producto.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not update product.', variant: 'destructive' });
     }
   }
 
@@ -222,7 +222,7 @@ export default function InventoryClient({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Buscar productos..."
+              placeholder="Search products..."
               className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -234,15 +234,15 @@ export default function InventoryClient({
                 <Button size="sm" className="h-9 gap-1">
                   <PlusCircle className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Añadir Producto
+                    Add Product
                   </span>
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Añadir Nuevo Producto</DialogTitle>
+                  <DialogTitle>Add New Product</DialogTitle>
                   <DialogDescription>
-                    Rellena los detalles para añadir un nuevo producto al inventario.
+                    Fill in the details to add a new product to inventory.
                   </DialogDescription>
                 </DialogHeader>
                 <AddProductForm onAddProduct={handleAddProduct} />
@@ -252,9 +252,9 @@ export default function InventoryClient({
            <Dialog open={!!editingProduct} onOpenChange={(isOpen) => !isOpen && setEditingProduct(null)}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Editar Producto</DialogTitle>
+                  <DialogTitle>Edit Product</DialogTitle>
                   <DialogDescription>
-                    Actualiza los detalles del producto.
+                    Update the product details.
                   </DialogDescription>
                 </DialogHeader>
                 {editingProduct && <EditProductForm product={editingProduct} onUpdateProduct={handleUpdateProduct} />}
@@ -264,9 +264,9 @@ export default function InventoryClient({
       </div>
       <Card className="mt-2">
         <CardHeader>
-          <CardTitle>Productos</CardTitle>
+          <CardTitle>Products</CardTitle>
           <CardDescription>
-            Gestiona tus productos y consulta el estado de su inventario.
+            Manage your products and view inventory status.
           </CardDescription>
         </CardHeader>
         <CardContent>

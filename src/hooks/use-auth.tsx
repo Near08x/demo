@@ -30,22 +30,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const { toast } = useToast();
 
-  // Cargar usuario persistido (localStorage)
+  // Load user from session (non-sensitive data only)
   const loadUser = useCallback(async () => {
     try {
-      const raw = typeof window !== 'undefined' ? localStorage.getItem('app_user') : null;
-      const rawRole = typeof window !== 'undefined' ? localStorage.getItem('app_role') : null;
-      if (raw) {
-        const u = JSON.parse(raw);
-        setUser(u as unknown as User);
+      // Check if we have valid auth tokens in cookies (handled by browser automatically)
+      // Make a request to verify session is valid
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include', // Send cookies
+      }).catch(() => null);
+
+      if (response?.ok) {
+        const data = await response.json();
+        setUser(data.user as unknown as User);
         setIsAuthenticated(true);
-        if (rawRole) setRoleState(rawRole as Role);
+        if (data.role) {
+          setRoleState(data.role as Role);
+          console.log('👤 User loaded with role:', data.role);
+        }
       } else {
         setUser(null);
         setIsAuthenticated(false);
       }
     } catch (e) {
-      console.warn('[AuthProvider] Error loading persisted user', e);
+      console.warn('Error loading user:', e);
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -57,63 +65,85 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loadUser();
   }, [loadUser]);
 
-  // Redirección
+  // Redirect based on auth state
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated && pathname !== '/login') router.push('/login');
     if (isAuthenticated && pathname === '/login') router.push('/');
   }, [isAuthenticated, isLoading, pathname, router]);
 
-  // Login usando API /profiles (persistencia local)
+  // Login with secure cookie handling
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      // Validate input
+      if (!email || !password) {
+        toast({
+          title: 'Validation Error',
+          description: 'Email and password are required',
+          variant: 'destructive',
+        });
+        return false;
+      }
+
+      if (email.length > 255) {
+        toast({
+          title: 'Validation Error',
+          description: 'Email is too long',
+          variant: 'destructive',
+        });
+        return false;
+      }
+
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // Include cookies in request
       });
 
       if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
         toast({
-          title: 'Error de autenticación',
-          description: 'Correo o contraseña incorrectos.',
+          title: 'Authentication Error',
+          description: errorData.message || 'Incorrect email or password',
           variant: 'destructive',
         });
         return false;
       }
 
       const { user: apiUser } = await res.json();
-      setSession(null);
+      console.log('🔑 Login successful:', apiUser.email, 'Role:', apiUser.role);
+      
       setUser(apiUser as unknown as User);
       setIsAuthenticated(true);
-      setRoleState((apiUser as any).role as Role);
-
-      try {
-        localStorage.setItem('app_user', JSON.stringify(apiUser));
-        localStorage.setItem('app_role', String((apiUser as any).role));
-      } catch {}
+      setRoleState(apiUser.role as Role);
 
       toast({
-        title: 'Inicio de sesión exitoso',
-        description: `Bienvenido ${(apiUser as any).username || (apiUser as any).email}`,
+        title: 'Login Successful',
+        description: `Welcome ${apiUser.email}`,
       });
+      
       return true;
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo conectar con el servidor.',
+        description: 'Could not connect to server',
         variant: 'destructive',
       });
       return false;
     }
   };
 
-  // Logout
+  // Logout with proper cleanup
   const logout = async () => {
     try {
-      localStorage.removeItem('app_user');
-      localStorage.removeItem('app_role');
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // Include cookies
+      }).catch(() => null);
     } catch {}
+    
     setUser(null);
     setSession(null);
     setIsAuthenticated(false);
@@ -125,7 +155,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{ user, session, role, isAuthenticated, isLoading, login, logout, setRole }}>
       {isLoading ? (
-        <div className="flex h-screen items-center justify-center">Cargando...</div>
+        <div className="flex h-screen items-center justify-center">Loading...</div>
       ) : (
         children
       )}

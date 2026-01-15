@@ -171,19 +171,19 @@ export default function LoansBIDashboard({
   const totalLateFee = loansWithCalculatedFees.reduce((acc, loan) => acc + loan.calculatedLateFee, 0);
   const totalOverdue = filteredLoans.reduce((acc, loan) => acc + loan.overdueAmount, 0);
 
-  // Estados de préstamos
+  // Loan states
   const activeLoans = filteredLoans.filter(l => l.status !== 'Pagado' && l.status !== 'Cancelado');
   const paidLoans = filteredLoans.filter(l => l.status === 'Pagado');
   const overdueLoans = loansWithCalculatedFees.filter(l => l.calculatedLateFee > 0 || l.overdueAmount > 0);
 
-  // Préstamos por estado
+  // Loans by status
   const loansByStatus = [
-    { name: 'Al Día', value: activeLoans.filter(l => l.overdueAmount === 0).length, color: '#10b981' },
-    { name: 'En Mora', value: overdueLoans.length, color: '#ef4444' },
-    { name: 'Pagados', value: paidLoans.length, color: '#3b82f6' },
+    { name: 'Up to Date', value: activeLoans.filter(l => l.overdueAmount === 0).length, color: '#10b981' },
+    { name: 'Overdue', value: overdueLoans.length, color: '#ef4444' },
+    { name: 'Paid', value: paidLoans.length, color: '#3b82f6' },
   ];
 
-  // Cuotas que vencen hoy, esta semana, este mes (acumulativo)
+  // Installments due today, this week, this month (cumulative)
   const startToday = startOfDay(now);
   const endOfToday = addDays(startToday, 1);
   const startWeek = startOfWeek(now);
@@ -202,17 +202,17 @@ export default function LoansBIDashboard({
         const dueDate = parseISO(installment.due_date || installment.dueDate || '');
         const clientName = getClientName(loan);
         
-        // Vence HOY: solo las cuotas con fecha de hoy
+        // Due TODAY: only installments with today's date
         if (!isBefore(dueDate, startToday) && isBefore(dueDate, endOfToday)) {
           dueTodayInstallments.push({ loan, installment, client: clientName });
         }
         
-        // Vence ESTA SEMANA: desde hoy hasta fin de semana (incluye hoy)
+        // Due THIS WEEK: from today to end of week (includes today)
         if (!isBefore(dueDate, startToday) && isBefore(dueDate, endOfWeek)) {
           dueThisWeekInstallments.push({ loan, installment, client: clientName });
         }
         
-        // Vence ESTE MES: desde hoy hasta fin de mes (incluye hoy y esta semana)
+        // Due THIS MONTH: from today to end of month (includes today and this week)
         if (!isBefore(dueDate, startToday) && isBefore(dueDate, endOfMonth)) {
           dueThisMonthInstallments.push({ loan, installment, client: clientName });
         }
@@ -251,10 +251,10 @@ export default function LoansBIDashboard({
     const margin = 14;
     let yPos = 20;
 
-    // Título
+    // Title
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('Reporte de BI - Préstamos', pageWidth / 2, yPos, { align: 'center' });
+    doc.text('BI Report - Loans', pageWidth / 2, yPos, { align: 'center' });
     
     yPos += 8;
     doc.setFontSize(11);
@@ -264,19 +264,19 @@ export default function LoansBIDashboard({
     
     yPos += 15;
 
-    // Resumen Ejecutivo
+    // Executive Summary
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Resumen Ejecutivo', margin, yPos);
+    doc.text('Executive Summary', margin, yPos);
     yPos += 7;
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     const summaryData = [
-      `Total Prestado: $${totalLoaned.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
-      `Ganancia Generada: $${totalProfit.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
-      `Por Cobrar: $${totalPending.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
-      `En Mora: $${totalOverdue.toLocaleString('es-ES', { minimumFractionDigits: 2 })} (+ $${totalLateFee.toFixed(2)} multas)`,
+      `Total Loaned: $${totalLoaned.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
+      `Profit Generated: $${totalProfit.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
+      `Receivables: $${totalPending.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
+      `Overdue: $${totalOverdue.toLocaleString('es-ES', { minimumFractionDigits: 2 })} (+ $${totalLateFee.toFixed(2)} penalties)`,
     ];
     summaryData.forEach(line => {
       doc.text(line, margin, yPos);
@@ -285,49 +285,49 @@ export default function LoansBIDashboard({
 
     yPos += 5;
 
-    // Estado de Préstamos
+    // Loan Status
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Estado de Préstamos', margin, yPos);
+    doc.text('Loan Status', margin, yPos);
     yPos += 6;
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     loansByStatus.forEach(status => {
-      doc.text(`${status.name}: ${status.value} préstamo(s)`, margin + 5, yPos);
+      doc.text(`${status.name}: ${status.value} loan(s)`, margin + 5, yPos);
       yPos += 5;
     });
 
     yPos += 5;
 
-    // Cuotas por Vencer
+    // Payment Calendar
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Calendario de Pagos', margin, yPos);
+    doc.text('Payment Calendar', margin, yPos);
     yPos += 6;
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Vencen Hoy: ${dueTodayInstallments.length} cuota(s)`, margin + 5, yPos);
+    doc.text(`Due Today: ${dueTodayInstallments.length} installment(s)`, margin + 5, yPos);
     yPos += 5;
-    doc.text(`Esta Semana: ${dueThisWeekInstallments.length} cuota(s)`, margin + 5, yPos);
+    doc.text(`This Week: ${dueThisWeekInstallments.length} installment(s)`, margin + 5, yPos);
     yPos += 5;
-    doc.text(`Este Mes: ${dueThisMonthInstallments.length} cuota(s)`, margin + 5, yPos);
+    doc.text(`This Month: ${dueThisMonthInstallments.length} installment(s)`, margin + 5, yPos);
     yPos += 8;
 
-    // Préstamos en Mora
+    // Overdue Loans
     if (overdueLoans.length > 0) {
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(`Préstamos en Mora (${overdueLoans.length})`, margin, yPos);
+      doc.text(`Overdue Loans (${overdueLoans.length})`, margin, yPos);
       yPos += 6;
 
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.text('Cliente', margin, yPos);
-      doc.text('Préstamo #', margin + 50, yPos);
+      doc.text('Client', margin, yPos);
+      doc.text('Loan #', margin + 50, yPos);
       doc.text('Principal', margin + 85, yPos);
-      doc.text('Vencido', margin + 120, yPos);
+      doc.text('Overdue', margin + 120, yPos);
       doc.text('Mora', margin + 150, yPos);
       doc.text('Pendiente', margin + 170, yPos);
       yPos += 5;
@@ -395,10 +395,10 @@ export default function LoansBIDashboard({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
-            BI de Préstamos
+            Loans BI
           </h2>
           <p className="text-muted-foreground">
-            Análisis de rentabilidad y gestión de cartera de préstamos.
+            Profitability analysis and loan portfolio management.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -418,7 +418,7 @@ export default function LoansBIDashboard({
           </Select>
           <Button onClick={handleGeneratePDF} variant="outline">
             <Printer className="mr-2 h-4 w-4" />
-            Descargar PDF
+            Download PDF
           </Button>
         </div>
       </div>
@@ -432,34 +432,34 @@ export default function LoansBIDashboard({
             maximumFractionDigits: 2,
           })}`}
           icon={DollarSign}
-          description="Capital total en préstamos"
+          description="Total capital in loans"
         />
         <SummaryCard
-          title="Ganancia Generada"
+          title="Profit Generated"
           value={`$${totalProfit.toLocaleString('es-ES', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`}
           icon={TrendingUp}
-          description="Intereses cobrados"
+          description="Interest collected"
         />
         <SummaryCard
-          title="Por Cobrar"
+          title="Receivables"
           value={`$${totalPending.toLocaleString('es-ES', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`}
           icon={Clock}
-          description="Saldo pendiente total"
+          description="Total outstanding balance"
         />
         <SummaryCard
-          title="En Mora"
+          title="Overdue"
           value={`$${totalOverdue.toLocaleString('es-ES', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`}
           icon={AlertCircle}
-          description={`+ $${totalLateFee.toFixed(2)} en multas`}
+          description={`+ $${totalLateFee.toFixed(2)} in penalties`}
         />
       </div>
 
@@ -467,9 +467,9 @@ export default function LoansBIDashboard({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Estado de Préstamos</CardTitle>
+            <CardTitle>Loan Status</CardTitle>
             <CardDescription>
-              Distribución de préstamos por estado.
+              Loan distribution by status.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -499,9 +499,9 @@ export default function LoansBIDashboard({
 
         <Card>
           <CardHeader>
-            <CardTitle>Top 10 - Márgenes de Beneficio</CardTitle>
+            <CardTitle>Top 10 - Profit Margins</CardTitle>
             <CardDescription>
-              Clientes con préstamos de mayor % de ganancia.
+              Clients with loans generating highest % profit.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -634,15 +634,15 @@ export default function LoansBIDashboard({
         </Card>
       </div>
 
-      {/* Tabla de préstamos en mora */}
+      {/* Overdue loans table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
-            Préstamos en Mora ({overdueLoans.length})
+            Overdue Loans ({overdueLoans.length})
           </CardTitle>
           <CardDescription>
-            Clientes con pagos atrasados que requieren seguimiento.
+            Clients with late payments requiring follow-up.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -662,7 +662,7 @@ export default function LoansBIDashboard({
               {overdueLoans.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground">
-                    No hay préstamos en mora
+                    No overdue loans
                   </TableCell>
                 </TableRow>
               ) : (

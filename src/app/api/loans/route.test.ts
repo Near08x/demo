@@ -269,7 +269,7 @@ describe('Loans API Routes', () => {
       const mockRequest = {
         json: vi.fn().mockResolvedValue({
           loanId: '550e8400-e29b-41d4-a716-446655440001',
-          installmentId: 'inst-1',
+          installmentId: '550e8400-e29b-41d4-a716-446655440002',
           paymentAmount: 500,
           paymentMethod: 'cash',
         }),

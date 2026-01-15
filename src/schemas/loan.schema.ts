@@ -1,18 +1,18 @@
 /**
  * Loan Schema Module
  * 
- * Schemas de validación Zod para préstamos y cuotas
- * Usados en API routes para validar inputs del cliente
+ * Zod validation schemas for loans and installments
+ * Used in API routes to validate client inputs
  */
 
 import { z } from 'zod';
 
 // =========================
-//    VALIDACIÓN DE CUOTAS
-// =========================
+//    INSTALLMENT VALIDATION
+//    ======================
 
 /**
- * Estados válidos de una cuota
+ * Valid installment states
  * - Pendiente: No ha sido pagada
  * - Pagado: Completamente pagada
  * - Parcial: Parcialmente pagada
@@ -26,7 +26,7 @@ export const installmentStatusSchema = z.enum([
 ]);
 
 /**
- * Schema de validación para una cuota (installment)
+ * Validation schema for an installment
  * 
  * Soporta campos duales (snake_case y camelCase) para compatibilidad
  * entre frontend y backend.
@@ -84,9 +84,9 @@ export const loanStatusSchema = z.enum([
 ]);
 
 /**
- * Schema de validación para un préstamo completo
+ * Validation schema for a complete loan
  * 
- * Incluye todos los campos del préstamo y sus cuotas.
+ * Includes all loan fields and their installments.
  * Soporta campos duales para compatibilidad frontend/backend.
  * 
  * @example
@@ -107,7 +107,7 @@ export const loanStatusSchema = z.enum([
  */
 export const loanSchema = z.object({
   id: z.string().uuid().optional(),
-  loanNumber: z.string().min(1, 'Número de préstamo requerido'),
+  loanNumber: z.string().min(1, 'Loan number required'),
   client_id: z.string().uuid().nullable().optional(),
   client_name: z.string().optional(),
   customerName: z.string().optional(),
@@ -121,10 +121,10 @@ export const loanSchema = z.object({
   due_date: z.string().nullable().optional(),
   dueDate: z.string().nullable().optional(),
   
-  // Datos financieros
-  principal: z.number().positive('El capital debe ser mayor a 0'),
-  interestRate: z.number().nonnegative('La tasa de interés no puede ser negativa').max(100, 'Tasa de interés inválida'),
-  amount: z.number().positive('El monto debe ser mayor a 0'),
+  // Financial data
+  principal: z.number().positive('Principal must be greater than 0'),
+  interestRate: z.number().nonnegative('Interest rate cannot be negative').max(100, 'Invalid interest rate'),
+  amount: z.number().positive('Amount must be greater than 0'),
   amountToPay: z.number().nonnegative(),
   amountApplied: z.number().nonnegative().default(0),
   overdueAmount: z.number().nonnegative().default(0),
@@ -132,7 +132,7 @@ export const loanSchema = z.object({
   change: z.number().optional(),
   totalPending: z.number().nonnegative(),
   
-  // Cuotas
+  // Installments
   installments: z.array(installmentSchema),
   
   // Extras
@@ -147,10 +147,10 @@ export const loanSchema = z.object({
 // =========================
 
 /**
- * Schema para crear un nuevo préstamo
- * 
- * Valida los campos mínimos requeridos para crear un préstamo.
- * Las cuotas se generan automáticamente en el servicio.
+ * Schema for creating a new loan
+ *
+ * Validates the minimum required fields to create a loan.
+ * Installments are automatically generated in the service.
  * 
  * @example
  * ```typescript
@@ -167,21 +167,33 @@ export const loanSchema = z.object({
  * ```
  */
 export const createLoanSchema = z.object({
-  client_id: z.string().uuid('ID de cliente inválido'),
-  client_name: z.string().min(1, 'Nombre del cliente requerido'),
-  principal: z.number().positive('El capital debe ser mayor a 0'),
-  interestRate: z.number().nonnegative('La tasa de interés no puede ser negativa').max(100),
-  loanTerm: z.number().int().positive('El plazo debe ser mayor a 0'),
-  loanType: z.string().min(1, 'Tipo de préstamo requerido'),
+  client_id: z.string().uuid('Invalid client ID'),
+  client_name: z.string().min(1, 'Client name required'),
+  loanNumber: z.string().optional(),
+  principal: z.number().positive('Principal must be greater than 0'),
+  interestRate: z.number().nonnegative('Interest rate cannot be negative').max(100),
+  amount: z.number().positive().optional(),
+  amountToPay: z.number().positive().optional(),
+  amountApplied: z.number().nonnegative().optional(),
+  overdueAmount: z.number().nonnegative().optional(),
+  lateFee: z.number().nonnegative().optional(),
+  change: z.number().nonnegative().optional(),
+  totalPending: z.number().nonnegative().optional(),
+  loanTerm: z.number().int().positive('Loan term must be greater than 0').optional(),
+  loanType: z.string().min(1, 'Loan type required').optional(),
   startDate: z.string(),
+  dueDate: z.string().optional(),
+  loanDate: z.string().optional(),
+  status: z.string().optional(),
+  installments: z.array(z.any()).optional(),
   cashier: z.string().optional(),
 });
 
 /**
- * Schema para procesar un pago en un préstamo
+ * Schema for processing a loan payment
  * 
- * Valida los datos necesarios para aplicar un pago.
- * El pago se distribuye automáticamente entre cuotas pendientes.
+ * Validates the data needed to apply a payment.
+ * Payment is automatically distributed among pending installments.
  * 
  * @example
  * ```typescript
@@ -194,16 +206,19 @@ export const createLoanSchema = z.object({
  * ```
  */
 export const processPaymentSchema = z.object({
-  loanId: z.string().uuid('ID de préstamo inválido'),
-  paymentAmount: z.number().positive('El monto del pago debe ser mayor a 0'),
+  loanId: z.string().uuid('Invalid loan ID'),
+  installmentId: z.string().uuid('Invalid installment ID').optional(),
+  paymentAmount: z.number().positive('Payment amount must be greater than 0'),
   paymentDate: z.string().optional(),
+  paymentMethod: z.string().optional(),
+  applyOverpaymentToPrincipal: z.boolean().optional(),
   applyToInstallments: z.array(z.number().int().positive()).optional(),
 });
 
 /**
- * Schema para actualizar un préstamo existente
- * 
- * Permite actualizar campos específicos del préstamo.
+ * Schema for updating an existing loan
+ *
+ * Allows updating specific loan fields.
  * Todos los campos excepto 'id' son opcionales.
  * 
  * @example
@@ -217,7 +232,7 @@ export const processPaymentSchema = z.object({
  * ```
  */
 export const updateLoanSchema = z.object({
-  id: z.string().uuid('ID de préstamo inválido'),
+  id: z.string().uuid('Invalid loan ID'),
   status: loanStatusSchema.optional(),
   lateFee: z.number().nonnegative().optional(),
   amountApplied: z.number().nonnegative().optional(),
@@ -227,10 +242,10 @@ export const updateLoanSchema = z.object({
 /**
  * Tipos TypeScript inferidos de los schemas Zod
  * 
- * - CreateLoanInput: Datos para crear un préstamo
- * - ProcessPaymentInput: Datos para procesar un pago
- * - UpdateLoanInput: Datos para actualizar un préstamo
- * - LoanInput: Préstamo completo validado
+ * - CreateLoanInput: Data for creating a loan
+ * - LoanPaymentInput: Data for processing a payment
+ * - UpdateLoanInput: Data for updating a loan
+ * - LoanInput: Validated complete loan
  * - InstallmentInput: Cuota validada
  */
 export type CreateLoanInput = z.infer<typeof createLoanSchema>;

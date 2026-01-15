@@ -15,24 +15,24 @@ export const clientSchema = z.object({
 //    SCHEMAS PARA API
 // =========================
 
-// Crear cliente (campos requeridos)
+// Create client (required fields)
 export const createClientSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido').max(255),
-  email: z.string().email('Email inválido'),
-  phone: z.string().min(7, 'Teléfono inválido').max(20),
+  name: z.string().min(1, 'Name is required').max(255),
+  email: z.string().email('Invalid email'),
+  phone: z.string().min(7, 'Invalid phone').max(20),
 });
 
-// Actualizar cliente (todos opcionales excepto id)
+// Update client (all optional except id)
 export const updateClientSchema = z.object({
-  id: z.string().uuid('ID de cliente inválido'),
+  id: z.string().uuid('Invalid client ID'),
   name: z.string().min(1).max(255).optional(),
   email: z.string().email().optional(),
   phone: z.string().min(7).max(20).optional(),
 });
 
-// Buscar cliente por ID
-export const clientIdSchema = z.object({
-  id: z.string().uuid('ID de cliente inválido'),
+// Find client by ID
+export const getClientByIdSchema = z.object({
+  id: z.string().uuid('Invalid client ID'),
 });
 
 // Tipos inferidos

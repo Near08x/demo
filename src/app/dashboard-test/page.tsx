@@ -1,89 +1,93 @@
-'use client';
+export const revalidate = 60; // Revalidar cada 60 segundos
+
 import { CreditCard, DollarSign, Package } from 'lucide-react';
 import SummaryCard from '@/components/dashboard/summary-card';
 import RecentSales from '@/components/dashboard/recent-sales';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import RecentClients from '@/components/dashboard/recent-clients';
 import MainLayout from '@/components/main-layout';
-import { useEffect, useState } from 'react';
 import type { Product, Sale } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/lib/supabaseServer';
 
-function DashboardSkeleton() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Skeleton className="h-32" />
-        <Skeleton className="h-32" />
-        <Skeleton className="h-32" />
-        <Skeleton className="h-32" />
-      </div>
-      <div className="grid gap-6 md:grid-cols-2">
-        <Skeleton className="h-96" />
-        <Skeleton className="h-96" />
-      </div>
-    </div>
-  );
+async function getProducts(): Promise<Product[]> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('name', { ascending: true });
+    
+    if (error) throw error;
+    return data ?? [];
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
 }
 
-export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [loading, setLoading] = useState(true);
+async function getSales(): Promise<Sale[]> {
+  try {
+    const { data: sales, error } = await supabase
+      .from('sales')
+      .select(`
+        id,
+        subtotal,
+        tax,
+        total,
+        amount,
+        amount_paid,
+        change_returned,
+        payment_method,
+        created_at,
+        customer_email,
+        customer_name,
+        clients ( name ),
+        sale_items (
+          id,
+          product_id,
+          quantity,
+          unit_price,
+          products ( name )
+        )
+      `)
+      .order('created_at', { ascending: false });
 
-  useEffect(() => {
-    console.log('[Dashboard] Mounted → estoy en /');
+    if (error) throw error;
+    
+    // Normalize sales data to match Sale type
+    const normalizedSales: Sale[] = (sales ?? []).map((sale: any) => ({
+      id: sale.id,
+      customerName: sale.customer_name || sale.clients?.name || 'General Customer',
+      customerEmail: sale.customer_email || 'N/A',
+      subtotal: Number(sale.subtotal || sale.total || 0),
+      amount: Number(sale.amount || sale.total || 0),
+      tax: Number(sale.tax || 0),
+      date: sale.created_at,
+      items: (sale.sale_items ?? []).map((item: any) => ({
+        id: item.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: Number(item.unit_price || 0),
+        product_name: item.products?.name || 'Unknown Product',
+      })),
+    }));
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        console.log('[Dashboard] Fetching /api/products y /api/sales ...');
+    return normalizedSales;
+  } catch (error) {
+    console.error('Error fetching sales:', error);
+    return [];
+  }
+}
 
-        const [productsRes, salesRes] = await Promise.all([
-          fetch(`/api/products`, { cache: 'no-store' }),
-          fetch(`/api/sales`, { cache: 'no-store' }),
-        ]);
-
-        console.log('[Dashboard] productsRes.ok:', productsRes.ok, 'salesRes.ok:', salesRes.ok);
-
-        if (!productsRes.ok || !salesRes.ok) {
-          throw new Error('Failed to fetch dashboard data');
-        }
-
-        const productsData = await productsRes.json();
-        const salesData = await salesRes.json();
-
-        console.log('[Dashboard] Datos recibidos:', {
-          products: productsData,
-          sales: salesData,
-        });
-
-        setProducts(productsData);
-        setSales(salesData);
-      } catch (error) {
-        console.error('[Dashboard] Error al obtener datos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+export default async function DashboardTestPage() {
+  const [products, sales] = await Promise.all([
+    getProducts(),
+    getSales(),
+  ]);
 
   const totalRevenue = sales.reduce((acc, sale) => acc + sale.amount, 0);
   const totalSales = sales.length;
   const lowStockItems = products.filter((product) => product.stock < 10).length;
   const totalProducts = products.length;
-
-  console.log('[Dashboard] Render →', { products, sales, loading });
-
-  if (loading) {
-    return (
-      <MainLayout>
-        <DashboardSkeleton />
-      </MainLayout>
-    );
-  }
 
   return (
     <MainLayout>
@@ -121,7 +125,7 @@ export default function Home() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Ventas Recientes</CardTitle>
+              <CardTitle>Recent Sales</CardTitle>
             </CardHeader>
             <CardContent>
               <RecentSales sales={sales} />

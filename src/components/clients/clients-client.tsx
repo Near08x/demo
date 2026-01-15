@@ -111,9 +111,9 @@ export default function ClientsClient({ initialClients, sales }: { initialClient
         }
         
         setAddClientOpen(false);
-        toast({ title: 'Éxito', description: 'Cliente añadido correctamente.' });
+        toast({ title: 'Success', description: 'Client added successfully.' });
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudo añadir el cliente.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not add client.', variant: 'destructive' });
     }
   };
   
@@ -126,9 +126,9 @@ export default function ClientsClient({ initialClients, sales }: { initialClient
         });
         if (!response.ok) throw new Error('Failed to delete client');
         setClients((prev) => prev.filter(client => client.email !== clientEmail));
-        toast({ title: 'Éxito', description: 'Cliente eliminado correctamente.' });
+        toast({ title: 'Success', description: 'Client deleted successfully.' });
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudo eliminar el cliente. Es posible que esté asociado a ventas o préstamos.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not delete client. It may be associated with sales or loans.', variant: 'destructive' });
     }
   }
 
@@ -144,9 +144,9 @@ export default function ClientsClient({ initialClients, sales }: { initialClient
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Clientes</CardTitle>
+            <CardTitle>Clients</CardTitle>
             <CardDescription>
-              Gestiona tus clientes y visualiza su historial de compras.
+              Manage your clients and view their purchase history.
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -154,7 +154,7 @@ export default function ClientsClient({ initialClients, sales }: { initialClient
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Buscar clientes..."
+                placeholder="Search clients..."
                 className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -165,15 +165,15 @@ export default function ClientsClient({ initialClients, sales }: { initialClient
                 <Button size="sm" className="h-9 gap-1">
                   <UserPlus className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Añadir Cliente
+                    Add Client
                   </span>
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Añadir Nuevo Cliente</DialogTitle>
+                  <DialogTitle>Add New Client</DialogTitle>
                   <DialogDescription>
-                    Rellena los detalles para añadir un nuevo cliente.
+                    Fill in the details to add a new client.
                   </DialogDescription>
                 </DialogHeader>
                 <AddClientForm onAddClient={handleAddClient} />
@@ -186,10 +186,10 @@ export default function ClientsClient({ initialClients, sales }: { initialClient
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nombre</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Teléfono</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -205,23 +205,23 @@ export default function ClientsClient({ initialClients, sales }: { initialClient
                         variant="ghost"
                         size="icon"
                         className="text-destructive hover:text-destructive h-8 w-8"
-                        aria-label={`Eliminar cliente ${client.name}`}
+                        aria-label={`Delete client ${client.name}`}
                       >
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Eliminar cliente</span>
+                        <span className="sr-only">Delete client</span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>¿Eliminar este cliente?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete this client?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Esta acción no se puede deshacer. Si el cliente está asociado a ventas o préstamos, la operación fallará.
+                          This action cannot be undone. If the client is associated with sales or loans, the operation will fail.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => handleDeleteClient(client.email)}>
-                          Eliminar
+                          Delete
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

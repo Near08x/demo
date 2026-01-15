@@ -31,7 +31,7 @@ export default function PayLoanModal({
   const [overpaymentChoice, setOverpaymentChoice] = useState<'change' | 'apply' | null>(null)
   const [dueAmount, setDueAmount] = useState<number>(0)
 
-  // ✅ calcular monto pendiente
+  // ✅ calculate pending amount
   useEffect(() => {
     if (!loan) return
     const pendingInstallment = loan.installments.find(
@@ -54,7 +54,7 @@ export default function PayLoanModal({
     }
   }, [loan])
 
-  // ✅ cuando paga más, mostrar el diálogo
+  // ✅ when paying more, show dialog
   useEffect(() => {
     if (paymentAmount > dueAmount && dueAmount > 0) {
       setShowOverpaymentDialog(true)
@@ -79,9 +79,9 @@ export default function PayLoanModal({
               i.status === 'Parcial' ||
               i.status === 'Atrasado'
           )?.id,
-          amountPaid: paymentAmount,
+          paymentAmount: paymentAmount,
           paymentMethod,
-          applyOverpaymentToPrincipal: overpaymentChoice === 'apply', // ✅ aquí se define si aplica o no
+          applyOverpaymentToPrincipal: overpaymentChoice === 'apply', // ✅ here it's defined whether to apply or not
         }),
       })
 
@@ -90,17 +90,17 @@ export default function PayLoanModal({
 
       onPaymentSuccess(data.loan)
       toast({
-        title: 'Pago exitoso',
+        title: 'Successful Payment',
         description: overpaymentChoice === 'apply'
-          ? 'El exceso fue abonado al capital.'
-          : 'El cambio fue devuelto correctamente.',
+          ? 'The excess was applied to the principal.'
+          : 'The change was returned correctly.',
       })
       onClose()
     } catch (error) {
       console.error('Error procesando pago:', error)
       toast({
         title: 'Error',
-        description: 'No se pudo procesar el pago.',
+        description: 'Could not process payment.',
         variant: 'destructive',
       })
     } finally {

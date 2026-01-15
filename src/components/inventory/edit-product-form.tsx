@@ -19,28 +19,28 @@ import type { Product } from '@/lib/types';
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: 'El nombre debe tener al menos 2 caracteres.',
+    message: 'Name must be at least 2 characters.',
   }),
   description: z.string().min(10, {
-    message: 'La descripción debe tener al menos 10 caracteres.',
+    message: 'Description must be at least 10 characters.',
   }),
   price: z.coerce.number().positive({
-    message: 'El precio debe ser un número positivo.',
+    message: 'Price must be a positive number.',
   }),
   price2: z.coerce.number().positive({
-    message: 'El precio 2 debe ser un número positivo.',
+    message: 'Price 2 must be a positive number.',
   }),
   price3: z.coerce.number().positive({
-    message: 'El precio 3 debe ser un número positivo.',
+    message: 'Price 3 must be a positive number.',
   }),
   cost: z.coerce.number().positive({
-    message: 'El costo debe ser un número positivo.',
+    message: 'Cost must be a positive number.',
   }),
   provider: z.string().min(2, {
-    message: 'El proveedor debe tener al menos 2 caracteres.',
+    message: 'Provider must be at least 2 characters.',
   }),
   stock: z.coerce.number().int().min(0, {
-    message: 'El stock debe ser un número entero no negativo.',
+    message: 'Stock must be a non-negative integer.',
   }),
 });
 
@@ -76,7 +76,7 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del Producto</FormLabel>
+              <FormLabel>Product Name</FormLabel>
               <FormControl>
                 <Input placeholder="Galaxy S25 Ultra" {...field} />
               </FormControl>
@@ -89,10 +89,10 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descripción</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe el producto..."
+                  placeholder="Describe the product..."
                   className="resize-none"
                   {...field}
                 />
@@ -107,7 +107,7 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Precio 1 (Individual)</FormLabel>
+                <FormLabel>Price 1 (Retail)</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="1399.99" {...field} />
                 </FormControl>
@@ -120,7 +120,7 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
             name="price2"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Precio 2 (Mayor)</FormLabel>
+                <FormLabel>Price 2 (Wholesale)</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="1350.00" {...field} />
                 </FormControl>
@@ -133,7 +133,7 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
             name="price3"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Precio 3 (Oferta)</FormLabel>
+                <FormLabel>Price 3 (Sale)</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="1300.00" {...field} />
                 </FormControl>
@@ -148,7 +148,7 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
             name="cost"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Costo</FormLabel>
+                <FormLabel>Cost</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="999.99" {...field} />
                 </FormControl>
@@ -161,7 +161,7 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
             name="provider"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Proveedor</FormLabel>
+                <FormLabel>Provider</FormLabel>
                 <FormControl>
                   <Input placeholder="Samsung" {...field} />
                 </FormControl>
@@ -183,7 +183,7 @@ export default function EditProductForm({ product, onUpdateProduct }: EditProduc
             )}
           />
         </div>
-        <Button type="submit" className="w-full">Actualizar Producto</Button>
+        <Button type="submit" className="w-full">Update Product</Button>
       </form>
     </Form>
   );

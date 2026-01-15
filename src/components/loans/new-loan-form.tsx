@@ -61,7 +61,7 @@ type NewLoanFormProps = {
 const toYYYYMMDD = (d: Date) => format(d, 'yyyy-MM-dd');
 
 // ======================
-// 🧮 CALCULAR CUOTAS
+// 🧮 CALCULATE INSTALLMENTS
 // ======================
 const calculateInstallments = (
   loanData: Partial<z.infer<typeof formSchema>>
@@ -229,7 +229,7 @@ export default function NewLoanForm({ clients, onAddLoan, nextLoanNumber }: NewL
       return;
     }
 
-    // ✅ Calcular fecha límite final (última cuota)
+    // ✅ Calculate final due date (last installment)
     const lastDueDate =
       finalInstallments.length > 0
         ? finalInstallments[finalInstallments.length - 1].dueDate

@@ -1,42 +1,42 @@
 import { z } from 'zod';
 
 // =========================
-//    VALIDACIÓN DE DETALLES DE VENTA
+//    SALE DETAIL VALIDATION
 // =========================
 
 export const saleDetailSchema = z.object({
-  productId: z.string().uuid('ID de producto inválido'),
-  quantity: z.number().int().positive('La cantidad debe ser mayor a 0'),
-  unitPrice: z.number().nonnegative('El precio unitario no puede ser negativo'),
-  price: z.number().nonnegative('El precio no puede ser negativo'),
-  total: z.number().nonnegative('El total no puede ser negativo'),
+  productId: z.string().uuid('Invalid product ID'),
+  quantity: z.number().int().positive('Quantity must be greater than 0'),
+  unitPrice: z.number().nonnegative('Unit price cannot be negative'),
+  price: z.number().nonnegative('Price cannot be negative'),
+  total: z.number().nonnegative('Total cannot be negative'),
 });
 
 // =========================
-//    VALIDACIÓN DE VENTAS
+//    SALES VALIDATION
 // =========================
 
 export const saleSchema = z.object({
   id: z.string().uuid().optional(),
-  customerName: z.string().min(1, 'El nombre del cliente es requerido').max(255),
-  customerEmail: z.string().email('Email inválido'),
-  subtotal: z.number().nonnegative('El subtotal no puede ser negativo'),
-  amount: z.number().nonnegative('El monto no puede ser negativo'),
-  tax: z.number().nonnegative('El impuesto no puede ser negativo'),
+  customerName: z.string().min(1, 'Customer name is required').max(255),
+  customerEmail: z.string().email('Invalid email'),
+  subtotal: z.number().nonnegative('Subtotal cannot be negative'),
+  amount: z.number().nonnegative('Amount cannot be negative'),
+  tax: z.number().nonnegative('Tax cannot be negative'),
   date: z.string(),
-  items: z.array(saleDetailSchema).min(1, 'Debe haber al menos un producto en la venta'),
+  items: z.array(saleDetailSchema).min(1, 'There must be at least one product in the sale'),
 });
 
 // =========================
 //    SCHEMAS PARA API
 // =========================
 
-// Crear venta (campos requeridos)
+// Create sale (required fields)
 export const createSaleSchema = z.object({
-  customerName: z.string().min(1, 'El nombre del cliente es requerido').max(255),
-  customerEmail: z.string().email('Email inválido'),
-  items: z.array(saleDetailSchema).min(1, 'Debe haber al menos un producto en la venta'),
-  // Los totales se calcularán automáticamente en el servidor
+  customerName: z.string().min(1, 'Customer name is required').max(255),
+  customerEmail: z.string().email('Invalid email'),
+  items: z.array(saleDetailSchema).min(1, 'There must be at least one product in the sale'),
+  // Totals will be calculated automatically on the server
 }).refine(
   (data) => {
     // Validar que todos los items tengan valores coherentes
@@ -47,22 +47,22 @@ export const createSaleSchema = z.object({
     });
   },
   {
-    message: 'Los totales de los items no coinciden con cantidad * precio',
+    message: 'Item totals do not match quantity * price',
   }
 );
 
-// Actualizar venta (solo estado/fecha)
+// Update sale (status/date only)
 export const updateSaleSchema = z.object({
-  id: z.string().uuid('ID de venta inválido'),
+  id: z.string().uuid('Invalid sale ID'),
   date: z.string().optional(),
 });
 
-// Buscar venta por ID
-export const saleIdSchema = z.object({
-  id: z.string().uuid('ID de venta inválido'),
+// Find sale by ID
+export const getSaleByIdSchema = z.object({
+  id: z.string().uuid('Invalid sale ID'),
 });
 
-// Buscar ventas por rango de fechas
+// Find sales by date range
 export const salesByDateRangeSchema = z.object({
   startDate: z.string(),
   endDate: z.string(),

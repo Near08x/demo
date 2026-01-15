@@ -256,13 +256,15 @@ describe('Loans Service - Process Payment', () => {
 
     const result = await service.processPayment(paymentInput);
 
-    expect(repository.updateInstallments).toHaveBeenCalledWith(
+    expect(repository.updateInstallments).toHaveBeenCalled();
+    const calls = vi.mocked(repository.updateInstallments).mock.calls;
+    expect(calls[0][0]).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: 1,
+          id: expect.any(String),
           data: expect.objectContaining({
             paid_amount: expect.any(Number),
-            status: expect.any(String),
+            status: 'Pagado',
           }),
         }),
       ])

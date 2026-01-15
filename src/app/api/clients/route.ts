@@ -7,7 +7,7 @@ import { createClientSchema } from '@/schemas'
 import { logger } from '@/lib/logger'
 
 // =======================
-// GET: obtener todos los clientes
+// GET: get all clients
 // =======================
 export async function GET() {
   try {
@@ -29,7 +29,7 @@ export async function GET() {
 }
 
 // =======================
-// POST: crear cliente (o devolver existente si ya está)
+// POST: create client (or return existing if already exists)
 // =======================
 export const POST = apiHandler(async (request) => {
   const body = await request.json()
@@ -74,7 +74,7 @@ export const POST = apiHandler(async (request) => {
 })
 
 // =======================
-// DELETE: eliminar cliente por email
+// DELETE: delete client by email
 // =======================
 export async function DELETE(request: Request) {
   try {

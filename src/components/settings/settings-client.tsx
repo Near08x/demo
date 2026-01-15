@@ -29,7 +29,7 @@ export default function SettingsClient({ users: initialUsers, role }: SettingsCl
       setUsers(prev => [...prev, result]);
       toast({ title: 'Éxito', description: 'Usuario creado correctamente.' });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'No se pudo crear el usuario.';
+      const errorMessage = error instanceof Error ? error.message : 'Could not create user.';
       toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     }
   };
@@ -45,7 +45,7 @@ export default function SettingsClient({ users: initialUsers, role }: SettingsCl
       setUsers(prev => prev.filter(u => u.id !== userId));
       toast({ title: 'Éxito', description: 'Usuario eliminado correctamente.' });
     } catch (error) {
-      toast({ title: 'Error', description: 'No se pudo eliminar el usuario.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Could not delete user.', variant: 'destructive' });
     }
   };
 

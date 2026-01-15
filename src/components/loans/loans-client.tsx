@@ -162,7 +162,7 @@ useEffect(() => {
         setClients([]);
         toast({
           title: 'Error',
-          description: 'Fallo al conectar con la API',
+          description: 'Failed to connect to API',
           variant: 'destructive',
         });
       }
@@ -220,7 +220,7 @@ useEffect(() => {
   }, 0);
   const totalCapital = lentCapital + availableCapital;
 
-//      Crear pr  stamo (con refresco y apertura autom  tica)
+//      Create loan (with refresh and automatic opening)
 const handleAddLoan = async (newLoanData: Omit<Loan, 'id'>) => {
   try {
     const res = await fetch('/api/loans', {
@@ -283,8 +283,8 @@ const handleAddLoan = async (newLoanData: Omit<Loan, 'id'>) => {
 
     //     4. Mostrar toast confirmando
     toast({
-      title: 'Exito',
-      description: `Prestamo ${data.loanNumber} a  adido correctamente.`,
+      title: 'Success',
+      description: `Loan ${data.loanNumber} added successfully.`,
     });
 
     //     5. Esperar un poco y abrir autom  ticamente el pr  stamo reci  n creado
@@ -327,12 +327,12 @@ const handleEditLoan = (loan: Loan) => {
       if (!res.ok) throw new Error(data?.message || 'Error actualizando capital');
       setAvailableCapital(Number(data.total) || 0);
       setEditCapitalOpen(false);
-      toast({ title: 'Exito', description: 'Capital disponible actualizado correctamente.' });
+      toast({ title: 'Success', description: 'Available capital updated successfully.' });
     } catch (e) {
-      toast({ title: 'Error', description: 'No se pudo actualizar el capital.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Could not update capital.', variant: 'destructive' });
     }
   };
-  //      Actualizar pr  stamo
+  //      Update loan
   const handleUpdateLoan = async (updatedLoanData: Loan) => {
     try {
       const res = await fetch('/api/loans', {
@@ -351,20 +351,20 @@ const handleEditLoan = (loan: Loan) => {
       setEditingLoan(null);
 
       toast({
-        title: 'Exito',
-        description: 'Prestamo actualizado correctamente.',
+        title: 'Success',
+        description: 'Loan updated successfully.',
       });
     } catch (error) {
       console.error('    Error en handleUpdateLoan:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo actualizar el prestamo.',
+        description: 'Could not update loan.',
         variant: 'destructive',
       });
     }
   };
 
-  //      Eliminar pr  stamo
+  //      Delete loan
   const handleDeleteLoan = async (loanId: string) => {
     try {
       const res = await fetch('/api/loans', {
@@ -380,14 +380,14 @@ const handleEditLoan = (loan: Loan) => {
       setLoans((prev) => prev.filter((loan) => loan.id !== loanId));
 
       toast({
-        title: 'Exito',
-        description: 'Prestamo eliminado correctamente.',
+        title: 'Success',
+        description: 'Loan deleted successfully.',
       });
     } catch (error) {
       console.error('    Error en handleDeleteLoan:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo eliminar el prestamo.',
+        description: 'Could not delete loan.',
         variant: 'destructive',
       });
     }
@@ -594,7 +594,7 @@ useEffect(() => {
             <div className="flex flex-wrap items-center justify-end gap-2 text-center text-sm">
               <div className="flex h-16 min-w-[120px] flex-col justify-center rounded-lg border bg-card p-2 text-center">
                 <h3 className="font-medium text-muted-foreground">
-                  Capital Total
+                  Total Capital
                 </h3>
                 <p className="text-lg font-bold">
                   {`$${totalCapital.toLocaleString('es-ES', {
@@ -606,7 +606,7 @@ useEffect(() => {
 
               <div className="flex h-16 min-w-[120px] flex-col justify-center rounded-lg border bg-card p-2 text-center text-destructive">
                 <h3 className="font-medium text-muted-foreground">
-                  Capital Prestado
+                  Lent Capital
                 </h3>
                 <p className="text-lg font-bold">
                   {`$${lentCapital.toLocaleString('es-ES', {
@@ -617,7 +617,7 @@ useEffect(() => {
               </div>
               <div className="flex h-16 min-w-[120px] flex-col justify-center rounded-lg border bg-card p-2 text-center text-green-600">
                 <h3 className="font-medium text-muted-foreground">
-                  Capital Disp.
+                  Available Capital
                 </h3>
                 <p className="text-lg font-bold">
                   {`$${availableCapital.toLocaleString('es-ES', {
@@ -631,19 +631,19 @@ useEffect(() => {
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="h-full self-stretch">
                   <Edit className="mr-2 h-4 w-4" />
-                  Modificar Capital
+                  Modify Capital
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle>Modificar Capital Disponible</DialogTitle>
+                  <DialogTitle>Modify Available Capital</DialogTitle>
                   <DialogDescription>
-                    Actualiza el capital disponible (guardado en la base de datos).
+                    Update the available capital (saved in database).
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="capital" className="text-right">Capital Disponible</Label>
+                    <Label htmlFor="capital" className="text-right">Available Capital</Label>
                     <Input
                       id="capital"
                       type="number"
@@ -654,7 +654,7 @@ useEffect(() => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button onClick={handleUpdateCapital}>Guardar Cambios</Button>
+                  <Button onClick={handleUpdateCapital}>Save Changes</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -672,7 +672,7 @@ useEffect(() => {
               <div className="relative w-full max-w-sm">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar o seleccionar un cliente..."
+                  placeholder="Search or select a client..."
                   value={clientSearch}
                   onChange={(e) => setClientSearch(e.target.value)}
                   className="pl-8"
@@ -702,7 +702,7 @@ useEffect(() => {
                 value={selectedClient?.id || ''}
               >
                 <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="O selecciona" />
+                  <SelectValue placeholder="Or select" />
                 </SelectTrigger>
                 <SelectContent>
                   {clients.map((c) => (
@@ -720,13 +720,13 @@ useEffect(() => {
                   <Button size="sm" className="h-9 gap-1">
                     <PlusCircle className="h-3.5 w-3.5" />
                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                      Nuevo Prestamo
+                      New Loan
                     </span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl">
                   <DialogHeader>
-                    <DialogTitle>Crear Nuevo Prestamo</DialogTitle>
+                    <DialogTitle>Create New Loan</DialogTitle>
                   </DialogHeader>
                   <NewLoanForm
                     clients={clients}
@@ -773,12 +773,12 @@ useEffect(() => {
           {!selectedClient ? (
             <div className="flex h-64 flex-col items-center justify-center text-center text-muted-foreground">
               <Search className="h-12 w-12" />
-              <p className="mt-4">Selecciona un cliente para ver sus Prestamos.</p>
+              <p className="mt-4">Select a client to view their Loans.</p>
             </div>
           ) : clientLoans.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center text-center text-muted-foreground">
               <User className="h-12 w-12" />
-              <p className="mt-4">Este cliente no tiene Prestamos activos.</p>
+              <p className="mt-4">This client has no active Loans.</p>
             </div>
           ) : (
             <Accordion type="single" collapsible className="w-full">
@@ -804,9 +804,9 @@ useEffect(() => {
                       <div className="text-right">
                         {((loan.totalPending ?? 0) <= 1e-6 || loan.status === 'Pagado') ? (
                           <>
-                            <p className="font-semibold text-green-600">Saldado</p>
+                            <p className="font-semibold text-green-600">Paid Off</p>
                             <p className="text-sm text-muted-foreground">
-                              {`Pagado: $${(loan.amountApplied ?? 0).toLocaleString('es-ES', {
+                              {`Paid: $${(loan.amountApplied ?? 0).toLocaleString('es-ES', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               })}`}
@@ -815,7 +815,7 @@ useEffect(() => {
                         ) : (
                           <>
                             <p className="font-semibold text-destructive">
-                              {`Pendiente: $${Math.max(0, loan.totalPending ?? 0).toLocaleString('es-ES', {
+                              {`Pending: $${Math.max(0, loan.totalPending ?? 0).toLocaleString('es-ES', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               })}`}
@@ -834,7 +834,7 @@ useEffect(() => {
                   <AccordionContent>
                     <div className="mb-4 flex items-center justify-end gap-2">
                       <Button size="sm" variant="outline" onClick={() => handleOpenPayModal(loan)}>
-                        Realizar Pago
+                        Make Payment
                       </Button>
                       {role === 'admin' && (
                         <DropdownMenu>
@@ -845,15 +845,15 @@ useEffect(() => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => handleEditLoan(loan)}>
-                              Editar Prestamo
+                              Edit Loan
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive"
                               onClick={() => handleDeleteLoan(loan.id)}
                             >
-                              Eliminar
+                              Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -867,12 +867,12 @@ useEffect(() => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>#</TableHead>
-                          <TableHead>Fecha Limite</TableHead>
-                          <TableHead>Capital</TableHead>
-                          <TableHead>Intereses</TableHead>
-                          <TableHead>Abonado</TableHead>
-                          <TableHead>Mora</TableHead>
-                          <TableHead>Estado</TableHead>
+                          <TableHead>Due Date</TableHead>
+                          <TableHead>Principal</TableHead>
+                          <TableHead>Interest</TableHead>
+                          <TableHead>Paid</TableHead>
+                          <TableHead>Late Fee</TableHead>
+                          <TableHead>Status</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -948,7 +948,7 @@ useEffect(() => {
       <Dialog open={!!editingLoan} onOpenChange={(isOpen) => !isOpen && setEditingLoan(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Editar Prestamo</DialogTitle>
+            <DialogTitle>Edit Loan</DialogTitle>
           </DialogHeader>
           {editingLoan && (
             <EditLoanForm loan={editingLoan} clients={clients} onUpdateLoan={handleUpdateLoan} />
@@ -1025,7 +1025,7 @@ useEffect(() => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            companyName: 'CellStore POS',
+            companyName: 'Business App Demo',
             loanNumber: updatedLoan.loanNumber,
             clientName: updatedLoan.client_name,
             clientEmail: ((updatedLoan as any)?.client_email as string | undefined),
@@ -1045,8 +1045,8 @@ useEffect(() => {
 
       //     7. Feedback visual
       toast({
-        title: 'Pago procesado',
-        description: `El pago del prestamo ${updatedLoan.loanNumber} fue registrado correctamente.`,
+        title: 'Payment processed',
+        description: `Payment for loan ${updatedLoan.loanNumber} was recorded successfully.`,
       });
     } catch (error) {
       console.error('    Error refrescando PrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©stamos tras el pago:', error);

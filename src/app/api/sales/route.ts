@@ -27,7 +27,7 @@ const createSaleRequestSchema = z.object({
 });
 
 // =======================
-// GET: obtener ventas con cliente y detalles
+// GET: get sales with client and details
 // =======================
 export async function GET() {
   try {
@@ -69,7 +69,7 @@ export async function GET() {
       paymentMethod: s.payment_method,
       created_at: s.created_at,
       customerEmail: s.customer_email,
-      customerName: s.clients?.name ?? s.customer_name ?? 'Consumidor Final',
+      customerName: s.clients?.name ?? s.customer_name ?? 'General Customer',
       items: (s.sale_items ?? []).map((i: any) => ({
         id: i.id,
         productId: i.product_id,
@@ -90,7 +90,7 @@ export async function GET() {
 }
 
 // =======================
-// POST: crear venta con items y actualizar stock
+// POST: create sale with items and update stock
 // =======================
 export async function POST(request: Request) {
   try {
@@ -141,7 +141,7 @@ export async function POST(request: Request) {
 
     // --- cliente ---
     const emailToSave = customer_email || null
-    const nameToSave = customer_name || (!customer_email ? 'Consumidor Final' : null)
+    const nameToSave = customer_name || 'General Customer'
 
     // --- pago ---
     const method: PaymentMethod = payment_method || 'cash'

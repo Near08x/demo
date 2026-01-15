@@ -115,7 +115,7 @@ const ProductCard = ({
           onClick={handleAddToCartClick}
           disabled={product.stock === 0}
         >
-          <PlusCircle className="mr-2 h-4 w-4" /> Añadir
+          <PlusCircle className="mr-2 h-4 w-4" /> Add
         </Button>
       </CardFooter>
     </Card>
@@ -154,15 +154,15 @@ export default function PosClient({ products }: { products: Product[] }) {
         const refreshedProducts: Product[] = await response.json();
         setLocalProducts(refreshedProducts);
         toast({
-          title: 'Actualizado',
-          description: 'Lista de productos actualizada correctamente.',
+          title: 'Updated',
+          description: 'Product list updated successfully.',
         });
       }
     } catch (error) {
       console.error('Error al refrescar productos:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo actualizar la lista de productos.',
+        description: 'Could not update product list.',
         variant: 'destructive',
       });
     } finally {
@@ -214,8 +214,8 @@ export default function PosClient({ products }: { products: Product[] }) {
           );
         } else {
           toast({
-            title: 'Agotado',
-            description: `No se pueden agregar más ${product.name}.`,
+            title: 'Out of Stock',
+            description: `Cannot add more ${product.name}.`,
             variant: 'destructive',
           });
           return prevCart;
@@ -239,8 +239,8 @@ export default function PosClient({ products }: { products: Product[] }) {
       }
       if (newQuantity > itemToUpdate.stock) {
         toast({
-          title: 'Agotado',
-          description: `Solo ${itemToUpdate.stock} unidades de ${itemToUpdate.name} disponibles.`,
+          title: 'Out of Stock',
+          description: `Only ${itemToUpdate.stock} units of ${itemToUpdate.name} available.`,
           variant: 'destructive',
         });
         return prevCart;
@@ -275,9 +275,9 @@ export default function PosClient({ products }: { products: Product[] }) {
   const handleOpenPaymentModal = () => {
     if (cart.length === 0) {
       toast({
-        title: 'Carrito Vacío',
+        title: 'Empty Cart',
         description:
-          'Por favor, agregue artículos al carrito antes de completar una venta.',
+          'Please add items to cart before completing a sale.',
         variant: 'destructive',
       });
       return;
@@ -302,15 +302,15 @@ const handlePrint = () => {
         <body>
           <div class="center">
             <img src="/logo.png" width="80" />
-            <h2>CellStore</h2>
-            <p>Gracias por su compra</p>
+            <h2>Business App Demo</h2>
+            <p>Thank you for your purchase</p>
             <hr />
           </div>
-          <p><strong>Cliente:</strong> Juan Pérez</p>
+          <p><strong>Customer:</strong> Juan Pérez</p>
           <p><strong>Total:</strong> $120.00</p>
-          <p><strong>Método:</strong> Efectivo</p>
+          <p><strong>Method:</strong> Cash</p>
           <hr />
-          <p class="center">¡Vuelva pronto!</p>
+          <p class="center">Come back soon!</p>
         </body>
       </html>
     `);
@@ -323,9 +323,10 @@ const handlePrint = () => {
 
 
   const handleCompleteSale = async () => {
+    const isGeneralCustomer = !selectedClient;
     const salePayload = {
-      customerName: selectedClient?.name || 'Cliente General',
-      customerEmail: selectedClient?.email || 'cliente@general.com',
+      customerName: selectedClient?.name || (isGeneralCustomer ? 'General Customer' : null),
+      customerEmail: isGeneralCustomer ? null : selectedClient?.email,
       amount: total,
       date: new Date().toISOString(),
       // Enviar `price` (esperado por el endpoint /api/sales) con el precio unitario aplicado tras descuento.
@@ -389,7 +390,7 @@ const handlePrint = () => {
         }, 100);
 
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudo completar la venta.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not complete sale.', variant: 'destructive' });
     }
   };
 
@@ -409,9 +410,9 @@ const handlePrint = () => {
         
         setAddClientOpen(false);
         setSelectedClient(newClient);
-        toast({ title: 'Éxito', description: 'Cliente añadido y seleccionado.' });
+        toast({ title: 'Success', description: 'Client added and selected.' });
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudo añadir el cliente.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not add client.', variant: 'destructive' });
     }
   };
 
@@ -424,7 +425,7 @@ const handlePrint = () => {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <div className="flex gap-2">
                 <Input
-                  placeholder="Buscar productos para añadir al carrito..."
+                  placeholder="Search products to add to cart..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg bg-background pl-8"
@@ -476,13 +477,13 @@ const handlePrint = () => {
               </div>
             ) : searchQuery ? (
               <p className="py-8 text-center text-muted-foreground">
-                No se encontraron productos.
+                No products found.
               </p>
             ) : (
               <div className="flex h-64 flex-col items-center justify-center text-center text-muted-foreground">
                 <Search className="h-12 w-12" />
                 <p className="mt-4">
-                  Comienza a buscar para añadir productos.
+                  Start searching to add products.
                 </p>
               </div>
             )}
@@ -494,15 +495,15 @@ const handlePrint = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ShoppingCart /> Venta Actual
+              <ShoppingCart /> Current Sale
             </CardTitle>
             <div className='flex items-center gap-2 pt-2'>
                 <Select onValueChange={(email) => setSelectedClient(clients.find(c => c.email === email) || null)}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Cliente General" />
+                        <SelectValue placeholder="General Customer" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="general">Cliente General</SelectItem>
+                        <SelectItem value="general">General Customer</SelectItem>
                         {clients.map(client => (
                             <SelectItem key={client.email} value={client.email}>{client.name}</SelectItem>
                         ))}
@@ -514,9 +515,9 @@ const handlePrint = () => {
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                        <DialogTitle>Añadir Nuevo Cliente</DialogTitle>
+                        <DialogTitle>Add New Client</DialogTitle>
                         <DialogDescription>
-                            Rellena los detalles para añadir un nuevo cliente.
+                            Fill in the details to add a new client.
                         </DialogDescription>
                         </DialogHeader>
                         <AddClientForm onAddClient={handleAddClient} />
@@ -525,7 +526,7 @@ const handlePrint = () => {
             </div>
             {selectedClient && (
                 <CardDescription className='pt-2 flex items-center justify-between'>
-                    <span>Facturando a: <strong>{selectedClient.name}</strong></span>
+                    <span>Billing to: <strong>{selectedClient.name}</strong></span>
                     <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => setSelectedClient(null)}><X className='h-4 w-4'/></Button>
                 </CardDescription>
             )}
@@ -533,7 +534,7 @@ const handlePrint = () => {
           <CardContent className="space-y-4">
             {cart.length === 0 ? (
               <p className="text-center text-muted-foreground">
-                El carrito está vacío
+                Cart is empty
               </p>
             ) : (
               <div className="space-y-4">
@@ -574,7 +575,7 @@ const handlePrint = () => {
                           htmlFor={`discount-${item.id}`}
                           className="text-xs text-muted-foreground"
                         >
-                          Desc. %
+                          Disc. %
                         </label>
                         <Input
                           id={`discount-${item.id}`}
@@ -634,7 +635,7 @@ const handlePrint = () => {
               size="lg"
               onClick={handleOpenPaymentModal}
             >
-              Completar Venta
+              Complete Sale
             </Button>
           </CardFooter>
         </Card>
@@ -643,14 +644,14 @@ const handlePrint = () => {
       <Dialog open={isPaymentModalOpen} onOpenChange={setPaymentModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Procesar Pago</DialogTitle>
+            <DialogTitle>Process Payment</DialogTitle>
             <DialogDescription>
-              Seleccione el método de pago e ingrese el monto recibido.
+              Select payment method and enter amount received.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6">
             <div>
-              <Label className="mb-2 block">Método de Pago</Label>
+              <Label className="mb-2 block">Payment Method</Label>
               <RadioGroup
                 defaultValue="cash"
                 className="grid grid-cols-2 gap-4"
@@ -662,7 +663,7 @@ const handlePrint = () => {
                 >
                   <RadioGroupItem value="cash" id="cash" className="sr-only" />
                   <Wallet className="mb-3 h-6 w-6" />
-                  Efectivo
+                  Cash
                 </Label>
                 <Label
                   htmlFor="card"
@@ -670,7 +671,7 @@ const handlePrint = () => {
                 >
                   <RadioGroupItem value="card" id="card" className="sr-only" />
                   <CreditCard className="mb-3 h-6 w-6" />
-                  Tarjeta
+                  Card
                 </Label>
                  <Label
                   htmlFor="transfer"
@@ -678,7 +679,7 @@ const handlePrint = () => {
                 >
                   <RadioGroupItem value="transfer" id="transfer" className="sr-only" />
                   <Landmark className="mb-3 h-6 w-6" />
-                  Transferencia
+                  Transfer
                 </Label>
                  <Label
                   htmlFor="mixed"
@@ -686,12 +687,12 @@ const handlePrint = () => {
                 >
                   <RadioGroupItem value="mixed" id="mixed" className="sr-only" />
                   <Coins className="mb-3 h-6 w-6" />
-                  Mixto
+                  Mixed
                 </Label>
               </RadioGroup>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="amount-paid">Monto Recibido</Label>
+              <Label htmlFor="amount-paid">Amount Received</Label>
               <Input
                 id="amount-paid"
                 type="number"
@@ -703,7 +704,7 @@ const handlePrint = () => {
             <Separator />
             <div className="space-y-4 text-lg">
               <div className="flex justify-between font-semibold">
-                <span>Total a Pagar:</span>
+                <span>Total to Pay:</span>
                 <span>${total.toFixed(2)}</span>
               </div>
               <div
@@ -711,7 +712,7 @@ const handlePrint = () => {
                   change < 0 ? 'text-destructive' : 'text-primary'
                 }`}
               >
-                <span>Cambio:</span>
+                <span>Change:</span>
                 <span>${Math.max(0, change).toFixed(2)}</span>
               </div>
             </div>
@@ -721,10 +722,10 @@ const handlePrint = () => {
               variant="outline"
               onClick={() => setPaymentModalOpen(false)}
             >
-              Cancelar
+              Cancel
             </Button>
             <Button onClick={handleCompleteSale} disabled={change < 0}>
-              <Printer className="mr-2 h-4 w-4" /> Confirmar e Imprimir Recibo
+              <Printer className="mr-2 h-4 w-4" /> Confirm and Print Receipt
             </Button>
           </DialogFooter>
         </DialogContent>

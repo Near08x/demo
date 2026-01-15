@@ -70,7 +70,7 @@ export const PUT = apiHandler(async (request) => {
   return NextResponse.json(product)
 })
 
-// DELETE: eliminar producto
+// DELETE: delete product
 export async function DELETE(request: Request) {
   try {
     const { id } = (await request.json()) as { id: string }

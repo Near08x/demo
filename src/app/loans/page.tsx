@@ -10,7 +10,7 @@ async function getData(): Promise<{ loans: Loan[]; clients: Client[] }> {
     const [loansRes, clientsRes] = await Promise.all([
       supabaseServer.from('loans').select(`
         *,
-        loan_installments (*),
+        installments (*),
         clients (
           id,
           name,
@@ -30,8 +30,8 @@ async function getData(): Promise<{ loans: Loan[]; clients: Client[] }> {
     // Normalize loans data
     const normalizeLoan = (row: any): Loan => {
       // Normalizar installments
-      const rawInstallments = Array.isArray(row.loan_installments) 
-        ? row.loan_installments 
+      const rawInstallments = Array.isArray(row.installments) 
+        ? row.installments 
         : [];
       
       const installments = rawInstallments.map((inst: any) => ({

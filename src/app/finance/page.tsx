@@ -1,4 +1,6 @@
-﻿import MainLayout from '@/components/main-layout';
+﻿export const revalidate = 60; // Revalidar cada 60 segundos
+
+import MainLayout from '@/components/main-layout';
 import dynamic from 'next/dynamic';
 import type { Product, Sale, Loan, Client } from '@/lib/types';
 // Use the server-side Supabase client when fetching data in a server component
@@ -32,7 +34,7 @@ async function getData() {
       `),
       supabaseServer.from('loans').select(`
         *,
-        loan_installments (*),
+        installments (*),
         clients (
           id,
           name,

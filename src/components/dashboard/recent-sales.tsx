@@ -28,7 +28,7 @@ export default function RecentSales({ sales }: { sales: Sale[] }) {
           </div>
           <div className="ml-auto text-right">
             <p className="font-medium">
-              +${sale.subtotal.toLocaleString('es-ES', {
+              +${(sale.subtotal || sale.total || 0).toLocaleString('es-ES', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}

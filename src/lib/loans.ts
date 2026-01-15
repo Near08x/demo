@@ -58,7 +58,7 @@ export function computeAggregatesFromInstallments(installs: InstallmentRow[] = [
 
 export async function computeLoanAggregates(loanId: string) {
   const { data: inst, error } = await supabase
-    .from('loan_installments')
+    .from('installments')
     .select('*')
     .eq('loan_id', loanId);
 

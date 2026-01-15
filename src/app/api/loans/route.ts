@@ -20,15 +20,15 @@ function toLocalYYYYMMDD(d?: string | null): string | null {
 }
 
 // =======================
-// GET: Listar préstamos completos (con cliente, cuotas y pagos)
+// GET: List complete loans (with client, installments and payments)
 // =======================
 export const GET = apiHandler(async () => {
   logger.info('GET /api/loans - Fetching all loans');
 
-  // Usar servicio para obtener préstamos con agregados
+  // Use service to get loans with aggregates
   const loans = await loansService.getAllLoans();
 
-  // Obtener clientes para el selector
+  // Get clients for selector
   const { data: clients, error: clientError } = await supabase
     .from('clients')
     .select('id, name, email');
@@ -43,7 +43,7 @@ export const GET = apiHandler(async () => {
 });
 
 // =======================
-// POST: Crear préstamo
+// POST: Create loan
 // =======================
 export const POST = apiHandler(async (request) => {
   logger.info('POST /api/loans - Creating new loan');
@@ -64,7 +64,7 @@ export const POST = apiHandler(async (request) => {
 });
 
 // =======================
-// PUT: Actualizar préstamo
+// PUT: Update loan
 // =======================
 export const PUT = apiHandler(async (request) => {
   logger.info('PUT /api/loans - Updating loan');
@@ -85,7 +85,7 @@ export const PUT = apiHandler(async (request) => {
 });
 
 // =======================
-// PATCH: Procesar pago
+// PATCH: Process payment
 // =======================
 export const PATCH = apiHandler(async (request) => {
   logger.info('PATCH /api/loans - Processing payment');
@@ -113,7 +113,7 @@ export const PATCH = apiHandler(async (request) => {
 });
 
 // =======================
-// DELETE: Eliminar préstamo
+// DELETE: Delete loan
 // =======================
 export const DELETE = apiHandler(async (request) => {
   logger.info('DELETE /api/loans - Deleting loan');

@@ -37,7 +37,7 @@ type LoanRow = {
 };
 
 type InstallmentRow = {
-  id?: number;
+  id?: number | string; // Soporta tanto integer como UUID
   loan_id: string;
   installment_number: number;
   due_date: string;
@@ -50,22 +50,22 @@ type InstallmentRow = {
 };
 
 // =========================
-//    PRÉSTAMOS - READ
-// =========================
+//    LOANS - READ
+//    ======================
 
 /**
- * Obtiene todos los préstamos con sus cuotas desde Supabase
+ * Gets all loans with their installments from Supabase
  * 
- * Recupera todos los préstamos ordenados por fecha de creación (descendente),
- * y para cada uno obtiene sus cuotas asociadas.
+ * Retrieves all loans sorted by creation date (descending),
+ * and for each one gets its associated installments.
  * 
- * @returns Array de préstamos con cuotas mapeadas al tipo de aplicación
+ * @returns Array of loans with installments mapped to application type
  * @throws Error si falla la consulta a Supabase
  * 
  * @example
  * ```typescript
  * const loans = await getAllLoans();
- * console.log(loans[0].installments); // Cuotas del primer préstamo
+ * console.log(loans[0].installments); // Installments of the first loan
  * ```
  */
 export async function getAllLoans(): Promise<Loan[]> {
@@ -78,7 +78,7 @@ export async function getAllLoans(): Promise<Loan[]> {
     if (loansError) throw loansError;
     if (!loansData) return [];
 
-    // Obtener cuotas para cada préstamo
+    // Get installments for each loan
     const loans: Loan[] = [];
     for (const loan of loansData) {
       const installments = await getInstallmentsByLoanId(loan.id);
@@ -94,10 +94,10 @@ export async function getAllLoans(): Promise<Loan[]> {
 }
 
 /**
- * Obtiene un préstamo por ID desde Supabase
+ * Gets a loan by ID from Supabase
  * 
- * @param loanId - ID del préstamo a recuperar
- * @returns Préstamo con sus cuotas, o null si no existe
+ * @param loanId - ID of the loan to retrieve
+ * @returns Loan with its installments, or null if it doesn't exist
  * @throws Error si falla la consulta a Supabase
  * 
  * @example
@@ -140,13 +140,13 @@ export async function getLoanById(loanId: string): Promise<Loan | null> {
  * @example
  * ```typescript
  * const installments = await getInstallmentsByLoanId('abc-123');
- * console.log(installments.length); // Número de cuotas
+ * console.log(installments.length); // Number of installments
  * ```
  */
 export async function getInstallmentsByLoanId(loanId: string): Promise<Installment[]> {
   try {
     const { data, error } = await supabase
-      .from('loan_installments')
+      .from('installments')
       .select('*')
       .eq('loan_id', loanId)
       .order('installment_number', { ascending: true });
@@ -161,14 +161,14 @@ export async function getInstallmentsByLoanId(loanId: string): Promise<Installme
 }
 
 // =========================
-//    PRÉSTAMOS - WRITE
-// =========================
+//    LOANS - WRITE
+//    ======================
 
 /**
- * Crea un nuevo préstamo en Supabase
+ * Creates a new loan in Supabase
  * 
- * @param loanData - Datos del préstamo a insertar (formato snake_case DB)
- * @returns ID del préstamo creado
+ * @param loanData - Loan data to insert (snake_case DB format)
+ * @returns Created loan ID
  * @throws Error si falla la inserción o no se retorna ID
  * 
  * @example
@@ -202,12 +202,12 @@ export async function createLoan(loanData: Partial<LoanRow>): Promise<string> {
 }
 
 /**
- * Actualiza un préstamo en Supabase
+ * Updates a loan in Supabase
  * 
  * Solo actualiza los campos especificados en el objeto updates.
  * 
- * @param loanId - ID del préstamo a actualizar
- * @param updates - Campos a actualizar (formato snake_case DB)
+ * @param loanId - ID of the loan to update
+ * @param updates - Fields to update (snake_case DB format)
  * @returns Promise<void>
  * @throws Error si falla la actualización
  * 
@@ -241,14 +241,14 @@ export async function updateLoan(loanId: string, updates: Partial<LoanRow>): Pro
  * ADVERTENCIA: Operación irreversible. Elimina primero las cuotas,
  * luego el préstamo (para mantener integridad referencial).
  * 
- * @param loanId - ID del préstamo a eliminar
+ * @param loanId - ID of the loan to delete
  * @returns Promise<void>
  * @throws Error si falla la eliminación
  * 
  * @example
  * ```typescript
  * await deleteLoan('abc-123');
- * // Préstamo y cuotas eliminados permanentemente
+ * // Loan and installments permanently deleted
  * ```
  */
 export async function deleteLoan(loanId: string): Promise<void> {
@@ -298,20 +298,25 @@ export async function createInstallments(
   installments: Partial<InstallmentRow>[]
 ): Promise<void> {
   try {
-    const installmentsData = installments.map(inst => ({
-      loan_id: loanId,
-      installment_number: inst.installment_number!,
-      due_date: inst.due_date!,
-      principal_amount: inst.principal_amount!,
-      interest_amount: inst.interest_amount!,
-      paid_amount: inst.paid_amount ?? 0,
-      late_fee: inst.late_fee ?? 0,
-      status: inst.status ?? 'Pendiente',
-      payment_date: inst.payment_date ?? null,
-    }));
+    const installmentsData = installments.map(inst => {
+      const principalAmount = inst.principal_amount ?? 0;
+      const interestAmount = inst.interest_amount ?? 0;
+      return {
+        loan_id: loanId,
+        installment_number: inst.installment_number!,
+        due_date: inst.due_date!,
+        amount: principalAmount + interestAmount, // Requerido por la tabla
+        principal_amount: principalAmount,
+        interest_amount: interestAmount,
+        paid_amount: inst.paid_amount ?? 0,
+        late_fee: inst.late_fee ?? 0,
+        status: inst.status ?? 'Pendiente',
+        payment_date: inst.payment_date ?? null,
+      };
+    });
 
     const { error } = await supabase
-      .from('loan_installments')
+      .from('installments')
       .insert(installmentsData);
 
     if (error) throw error;
@@ -326,8 +331,8 @@ export async function createInstallments(
 /**
  * Actualiza una cuota en Supabase
  * 
- * @param installmentId - ID de la cuota a actualizar
- * @param updates - Campos a actualizar (formato snake_case DB)
+ * @param installmentId - ID of the installment to update
+ * @param updates - Fields to update (snake_case DB format)
  * @returns Promise<void>
  * @throws Error si falla la actualización
  * 
@@ -341,12 +346,12 @@ export async function createInstallments(
  * ```
  */
 export async function updateInstallment(
-  installmentId: number,
+  installmentId: number | string,
   updates: Partial<InstallmentRow>
 ): Promise<void> {
   try {
     const { error } = await supabase
-      .from('loan_installments')
+      .from('installments')
       .update(updates)
       .eq('id', installmentId);
 
@@ -377,7 +382,7 @@ export async function updateInstallment(
  * ```
  */
 export async function updateInstallments(
-  updates: Array<{ id: number; data: Partial<InstallmentRow> }>
+  updates: Array<{ id: number | string; data: Partial<InstallmentRow> }>
 ): Promise<void> {
   try {
     for (const update of updates) {
@@ -396,7 +401,7 @@ export async function updateInstallments(
  * 
  * ADVERTENCIA: Operación irreversible.
  * 
- * @param loanId - ID del préstamo cuyas cuotas se eliminarán
+ * @param loanId - ID of the loan whose installments will be deleted
  * @returns Promise<void>
  * @throws Error si falla la eliminación
  * 
@@ -409,7 +414,7 @@ export async function updateInstallments(
 export async function deleteInstallmentsByLoanId(loanId: string): Promise<void> {
   try {
     const { error } = await supabase
-      .from('loan_installments')
+      .from('installments')
       .delete()
       .eq('loan_id', loanId);
 

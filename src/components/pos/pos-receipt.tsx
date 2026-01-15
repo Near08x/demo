@@ -40,7 +40,7 @@ const PosReceipt = React.forwardRef<HTMLDivElement, PosReceiptProps>(
               alt="Logo"
               className="h-12 w-auto mx-auto mb-1"
             />
-            <h2 className="text-sm font-bold">CellStore</h2>
+            <h2 className="text-sm font-bold">Business App Demo</h2>
             <p className="text-xs">Gracias por su compra</p>
             <p className="text-xs">{date}</p>
           </div>

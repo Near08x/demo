@@ -25,7 +25,7 @@ export type SaleDetail = {
 };
 
 // =========================
-//    VENTAS
+//    SALES
 // =========================
 export type Sale = {
   id: string;
@@ -39,18 +39,18 @@ export type Sale = {
 };
 
 // =========================
-//    CLIENTES
+//    CLIENTS
 // =========================
 export type Client = {
   id: string;       // UUID generado por Supabase
   name: string;
   email: string;
   phone: string;
-  loans?: Loan[];   // Relación 1:N con préstamos
+  loans?: Loan[];   // 1:N relationship with loans
 };
 
 // =========================
-//    CUOTAS (loan_installments)
+//    INSTALLMENTS (loan_installments)
 // =========================
 export type InstallmentStatus =
   | 'Pendiente'
@@ -91,7 +91,7 @@ export type Loan = {
   id: string;                     // uuid
   loanNumber: string;             // loan_number
   client_id?: string | null;       // FK a clients.id
-  client_name?: string;           // nombre del cliente para UI
+  client_name?: string;           // client name for UI
   customerName?: string;          // legacy alias used in some components
   paymentType?: string;           // optional legacy field
   loanTerm?: number;              // optional UI helper (number of installments)
@@ -105,7 +105,7 @@ export type Loan = {
   due_date?: string | null;       // backend
   dueDate?: string | null;        // frontend
 
-  // Datos financieros
+  // Financial data
   principal: number;
   interestRate: number;           // interest_rate (anual %)
   amount: number;                 // monto solicitado
@@ -116,7 +116,7 @@ export type Loan = {
   change?: number;                // cambio devuelto
   totalPending: number;           // saldo total pendiente
 
-  // Cuotas
+  // Installments
   installments: Installment[];
 
   // Extras para interfaz

@@ -1,4 +1,6 @@
-﻿import MainLayout from '@/components/main-layout';
+﻿export const revalidate = 60; // Revalidar cada 60 segundos
+
+import MainLayout from '@/components/main-layout';
 import DashboardClient from '@/components/dashboard/dashboard-client';
 import type { Product, Sale } from '@/lib/types';
 import { supabase } from '@/lib/supabaseServer';

@@ -23,20 +23,22 @@ import {
 } from '@/components/ui/sidebar';
 import { Separator } from './ui/separator';
 import { useAuth } from '@/hooks/use-auth';
-import Image from 'next/image';
+import { StockChartLogo } from '@/components/stock-chart-logo';
 
 const allMenuItems = [
-  { href: '/', label: 'Tablero', icon: Home, roles: ['admin'] },
+  { href: '/', label: 'Dashboard', icon: Home, roles: ['admin'] },
   { href: '/pos', label: 'POS', icon: ShoppingCart, roles: ['admin', 'cashier'] },
-  { href: '/inventory', label: 'Inventario', icon: Boxes, roles: ['admin', 'cashier'] },
-  { href: '/clients', label: 'Clientes', icon: Users, roles: ['admin'] },
-  { href: '/finance', label: 'Finanzas', icon: PiggyBank, roles: ['admin'] },
-  { href: '/loans', label: 'Préstamos', icon: Landmark, roles: ['admin', 'cashier'] },
+  { href: '/inventory', label: 'Inventory', icon: Boxes, roles: ['admin', 'cashier'] },
+  { href: '/clients', label: 'Clients', icon: Users, roles: ['admin'] },
+  { href: '/finance', label: 'Finance', icon: PiggyBank, roles: ['admin'] },
+  { href: '/loans', label: 'Loans', icon: Landmark, roles: ['admin', 'cashier'] },
 ];
 
 export default function Nav() {
   const pathname = usePathname();
   const { role, logout } = useAuth();
+  
+  console.log('🧭 Nav component - Current role:', role);
   
   const menuItems = allMenuItems.filter(item => item.roles.includes(role));
 
@@ -44,12 +46,7 @@ export default function Nav() {
     <>
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center justify-center gap-2.5">
-          <Image
-            src="/logo.png"
-            alt="CellStore Logo"
-            width={120}
-            height={120}
-          />
+          <StockChartLogo width={120} height={120} />
         </Link>
       </SidebarHeader>
       <SidebarContent className="p-2">
@@ -71,16 +68,16 @@ export default function Nav() {
         <SidebarMenu>
             <SidebarMenuItem>
               <Link href="/settings">
-                <SidebarMenuButton isActive={pathname === '/settings'} tooltip="Configuración">
+                <SidebarMenuButton isActive={pathname === '/settings'} tooltip="Settings">
                   <Settings />
-                  <span>Configuración</span>
+                  <span>Settings</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Cerrar Sesión" onClick={logout}>
+            <SidebarMenuButton tooltip="Log Out" onClick={logout}>
               <LogOut />
-              <span>Cerrar Sesión</span>
+              <span>Log Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

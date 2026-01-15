@@ -75,9 +75,9 @@ export default function UserManagement({ users, onAddUser, onDeleteUser }: UserM
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Crear Nuevo Usuario</DialogTitle>
+                                <DialogTitle>Create New User</DialogTitle>
                                 <DialogDescription>
-                                    Rellena los detalles para crear una nueva cuenta.
+                                    Fill in the details to create a new account.
                                 </DialogDescription>
                             </DialogHeader>
                              <Form {...form}>
@@ -143,7 +143,7 @@ export default function UserManagement({ users, onAddUser, onDeleteUser }: UserM
                                     )}
                                     />
                                     <DialogFooter>
-                                        <Button type="submit">Crear Usuario</Button>
+                                        <Button type="submit">Create User</Button>
                                     </DialogFooter>
                                 </form>
                             </Form>

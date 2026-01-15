@@ -32,9 +32,9 @@ export const createProductSchema = z.object({
   stock: z.number().int().nonnegative('El stock debe ser mayor o igual a 0').default(0),
 });
 
-// Actualizar producto (todos opcionales excepto id)
+// Update product (all optional except id)
 export const updateProductSchema = z.object({
-  id: z.string().uuid('ID de producto inválido'),
+  id: z.string().uuid('Invalid product ID'),
   name: z.string().min(1).max(255).optional(),
   description: z.string().max(1000).optional(),
   price: z.number().nonnegative().optional(),
@@ -45,10 +45,10 @@ export const updateProductSchema = z.object({
   stock: z.number().int().nonnegative().optional(),
 });
 
-// Actualizar stock
-export const updateStockSchema = z.object({
-  id: z.string().uuid('ID de producto inválido'),
-  quantity: z.number().int('La cantidad debe ser un número entero'),
+// Update stock
+export const updateProductStockSchema = z.object({
+  id: z.string().uuid('Invalid product ID'),
+  quantity: z.number().int('Quantity must be an integer'),
   operation: z.enum(['add', 'subtract', 'set']),
 });
 

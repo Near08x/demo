@@ -57,14 +57,14 @@ export function UserNav() {
           <Link href="/settings">
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
-              <span>Perfil</span>
+              <span>Profile</span>
             </DropdownMenuItem>
           </Link>
           {role === 'admin' && (
             <Link href="/settings">
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
-                <span>Configuración</span>
+                <span>Settings</span>
               </DropdownMenuItem>
             </Link>
           )}
@@ -72,7 +72,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Cerrar sesión</span>
+          <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

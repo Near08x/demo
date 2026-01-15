@@ -12,17 +12,17 @@ import * as repository from './loans.repository';
 import { logger } from '@/lib/logger';
 
 // =========================
-//    OBTENER PRÉSTAMOS
+//    GET LOANS
 // =========================
 
 /**
- * Obtiene todos los préstamos con sus agregados calculados
+ * Gets all loans with their calculated aggregates
  * 
  * Recupera todos los préstamos de la base de datos y recalcula
  * los agregados (pending, overdue, lateFee, amountApplied) en base
  * a las cuotas actuales.
  * 
- * @returns Array de préstamos con agregados actualizados
+ * @returns Array of loans with updated aggregates
  * @throws Error si hay problemas de conexión con la base de datos
  * 
  * @example
@@ -34,7 +34,7 @@ import { logger } from '@/lib/logger';
 export async function getAllLoans(): Promise<Loan[]> {
   const loans = await repository.getAllLoans();
   
-  // Recalcular agregados para cada préstamo
+  // Recalculate aggregates for each loan
   return loans.map(loan => {
     const aggregates = calculator.computeLoanAggregates(loan.installments);
     return {
@@ -78,7 +78,7 @@ export async function getLoanById(loanId: string): Promise<Loan | null> {
 }
 
 // =========================
-//    CREAR PRÉSTAMO
+//    CREATE LOAN
 // =========================
 
 /**
@@ -92,7 +92,7 @@ export async function getLoanById(loanId: string): Promise<Loan | null> {
  * 5. Crea todas las cuotas asociadas
  * 6. Retorna el préstamo completo con sus cuotas
  * 
- * @param input - Datos del préstamo a crear (validados con Zod schema)
+ * @param input - Loan data to create (validated with Zod schema)
  * @returns Préstamo creado con todas sus cuotas
  * @throws Error si falla la creación o no se puede recuperar el préstamo creado
  * 
@@ -115,51 +115,65 @@ export async function getLoanById(loanId: string): Promise<Loan | null> {
 export async function createLoan(input: CreateLoanInput): Promise<Loan> {
   logger.info('Creating new loan', { clientId: input.client_id, principal: input.principal });
 
-  // 1. Calcular cuotas
-  const calculatedInstallments = calculator.calculateInstallments(
-    input.principal,
-    input.interestRate,
-    input.loanTerm,
-    input.loanType,
-    input.startDate
-  );
+  // If frontend already sent calculated installments, use them directly
+  let calculatedInstallments: Installment[];
+  let totalAmount: number;
+  
+  if (input.installments && input.installments.length > 0) {
+    // Use installments from frontend
+    calculatedInstallments = input.installments as Installment[];
+    totalAmount = input.amountToPay || calculatedInstallments.reduce(
+      (sum, inst) => sum + inst.principal_amount + inst.interest_amount,
+      0
+    );
+  } else if (input.loanTerm && input.loanType) {
+    // Calculate installments on backend
+    calculatedInstallments = calculator.calculateInstallments(
+      input.principal,
+      input.interestRate,
+      input.loanTerm,
+      input.loanType,
+      input.startDate
+    );
 
-  // 2. Calcular monto total
-  const totalAmount = calculator.calculateTotalAmount(
-    input.principal,
-    input.interestRate,
-    input.loanTerm,
-    input.loanType
-  );
+    totalAmount = calculator.calculateTotalAmount(
+      input.principal,
+      input.interestRate,
+      input.loanTerm,
+      input.loanType
+    );
+  } else {
+    throw new Error('Se requiere loanTerm y loanType, o installments precalculadas');
+  }
 
   // 3. Generar número de préstamo
-  const loanNumber = await generateLoanNumber();
+  const loanNumber = input.loanNumber || await generateLoanNumber();
 
-  // 4. Crear registro de préstamo
+  // 4. Create loan record
   const loanData = {
     loan_number: loanNumber,
     client_id: input.client_id,
     client_name: input.client_name,
     principal: input.principal,
     interest_rate: input.interestRate,
-    loan_term: input.loanTerm,
-    loan_type: input.loanType,
-    loan_date: calculator.todayLocal(),
+    loan_term: input.loanTerm || calculatedInstallments.length,
+    loan_type: input.loanType || 'Personalizado',
+    loan_date: input.loanDate || calculator.todayLocal(),
     start_date: input.startDate,
-    due_date: calculatedInstallments[calculatedInstallments.length - 1]?.dueDate ?? null,
-    amount: input.principal,
+    due_date: input.dueDate || (calculatedInstallments[calculatedInstallments.length - 1]?.dueDate ?? null),
+    amount: input.amount || input.principal,
     amount_to_pay: totalAmount,
-    amount_applied: 0,
-    overdue_amount: 0,
-    late_fee: 0,
-    total_pending: totalAmount,
-    status: 'Pendiente',
+    amount_applied: input.amountApplied || 0,
+    overdue_amount: input.overdueAmount || 0,
+    late_fee: input.lateFee || 0,
+    total_pending: input.totalPending || totalAmount,
+    status: input.status || 'Pendiente',
     cashier: input.cashier,
   };
 
   const loanId = await repository.createLoan(loanData);
 
-  // 5. Crear cuotas
+  // 5. Create installments
   const installmentsData = calculatedInstallments.map(inst => ({
     installment_number: inst.installmentNumber,
     due_date: inst.dueDate,
@@ -183,7 +197,7 @@ export async function createLoan(input: CreateLoanInput): Promise<Loan> {
 }
 
 // =========================
-//    PROCESAR PAGO
+//    PROCESS PAYMENT
 // =========================
 
 /**
@@ -215,7 +229,7 @@ export async function createLoan(input: CreateLoanInput): Promise<Loan> {
 export async function processPayment(input: ProcessPaymentInput): Promise<Loan> {
   logger.info('Processing payment', { loanId: input.loanId, amount: input.paymentAmount });
 
-  // 1. Obtener préstamo actual
+  // 1. Get current loan
   const loan = await repository.getLoanById(input.loanId);
   if (!loan) throw new Error('Loan not found');
 
@@ -229,16 +243,19 @@ export async function processPayment(input: ProcessPaymentInput): Promise<Loan> 
     throw new Error('No pending installments to apply payment');
   }
 
-  // 3. Actualizar cuotas
+  // 3. Update installments
   const paymentDate = input.paymentDate ?? calculator.todayLocal();
   const installmentUpdates = distributions.map(dist => {
     const installment = loan.installments.find(
       i => i.installmentNumber === dist.installmentNumber
     );
-    if (!installment?.id) throw new Error('Installment not found');
+    if (!installment) throw new Error('Installment not found');
+    if (!installment.id) {
+      throw new Error(`Invalid installment ID for installment #${dist.installmentNumber}`);
+    }
 
     return {
-      id: Number(installment.id),
+      id: installment.id, // Mantener como está (UUID o número)
       data: {
         paid_amount: dist.newPaidAmount,
         status: dist.newStatus,
@@ -249,7 +266,7 @@ export async function processPayment(input: ProcessPaymentInput): Promise<Loan> 
 
   await repository.updateInstallments(installmentUpdates);
 
-  // 4. Recalcular agregados del préstamo
+  // 4. Recalculate loan aggregates
   const updatedInstallments = loan.installments.map(inst => {
     const dist = distributions.find(d => d.installmentNumber === inst.installmentNumber);
     if (!dist) return inst;
@@ -265,7 +282,7 @@ export async function processPayment(input: ProcessPaymentInput): Promise<Loan> 
 
   const aggregates = calculator.computeLoanAggregates(updatedInstallments);
 
-  // 5. Actualizar préstamo
+  // 5. Update loan
   const allPaid = aggregates.totalPending === 0;
   await repository.updateLoan(input.loanId, {
     amount_applied: aggregates.amountApplied,
@@ -288,19 +305,19 @@ export async function processPayment(input: ProcessPaymentInput): Promise<Loan> 
 }
 
 // =========================
-//    ACTUALIZAR PRÉSTAMO
+//    UPDATE LOAN
 // =========================
 
 /**
- * Actualiza un préstamo existente
+ * Updates a loan
  * 
- * Permite actualizar campos específicos del préstamo:
+ * Allows updating specific loan fields:
  * - status: Estado del préstamo
  * - lateFee: Mora total
  * - amountApplied: Monto pagado
  * - totalPending: Monto pendiente
  * 
- * @param input - Datos a actualizar (solo los campos presentes se modifican)
+ * @param input - Data to update (only present fields will be modified)
  * @returns Préstamo actualizado
  * @throws Error si el préstamo no existe
  * 
@@ -388,7 +405,7 @@ async function generateLoanNumber(): Promise<string> {
  * Calcula y aplica moras a todas las cuotas vencidas y no pagadas.
  * La mora se calcula como: (principal + interés) * lateFeeRate * meses_vencidos
  * 
- * @param loanId - ID del préstamo a procesar
+ * @param loanId - ID of the loan to process
  * @param lateFeeRate - Tasa de mora por mes (default: 0.05 = 5%)
  * @returns Promise<void>
  * @throws Error si el préstamo no existe
@@ -398,7 +415,7 @@ async function generateLoanNumber(): Promise<string> {
  * // Aplicar mora del 5% mensual
  * await updateOverdueInstallments('123', 0.05);
  * 
- * // Usar tasa por defecto
+ * // Use default rate
  * await updateOverdueInstallments('123');
  * ```
  */
@@ -417,7 +434,7 @@ export async function updateOverdueInstallments(loanId: string, lateFeeRate: num
       const interest = Number(installment.interest_amount ?? 0);
       const totalDue = principal + interest;
       
-      // Calcular mora (ejemplo: 5% del total por cada mes vencido)
+      // Calculate late fee (example: 5% of total per overdue month)
       const monthsOverdue = Math.ceil(daysOverdue / 30);
       const lateFee = Number((totalDue * lateFeeRate * monthsOverdue).toFixed(2));
 

@@ -26,7 +26,7 @@ export async function GET() {
   }
 }
 
-// POST: crear usuario
+// POST: create user
 export async function POST(request: Request) {
   try {
     const { name, email, password, role } = await request.json()
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE: eliminar usuario
+// DELETE: delete user
 export async function DELETE(request: Request) {
   try {
     const { id } = (await request.json()) as { id: string }
