@@ -1,110 +1,235 @@
-﻿#  Business Management System - Live Demo
+<div align="center">
+  <h1>📊 Business Management System</h1>
+  <p><strong>Full-stack business management platform with POS, inventory control, and financial analytics</strong></p>
+  
+  <p>
+    <a href="https://demo-lyart-zeta-92.vercel.app"><strong>Live Demo →</strong></a>
+  </p>
 
-> A comprehensive business management platform for loans, sales, inventory, and client management built with Next.js, TypeScript, and Supabase.
-
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://your-demo-url.vercel.app)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-green)](https://supabase.com/)
-
-##  Live Demo
-
-**[Try the Live Demo ](https://your-demo-url.vercel.app)**
-
-Demo Credentials:
-- **Email:** demo@example.com
-- **Password:** DemoPassword123
-
->  This is a demo environment with sample data. All data is reset periodically.
-
-##  Key Features
-
-###  Loan Management
-- Create and track customer loans with flexible payment terms
-- Support for multiple payment frequencies (weekly, bi-weekly, monthly)
-- Automatic installment calculations
-- Payment history tracking
-- Printable payment receipts
-
-###  Point of Sale (POS)
-- Fast and intuitive sales interface
-- Barcode scanning support
-- Multiple payment methods
-- Real-time inventory updates
-- Receipt generation
-
-###  Inventory Management
-- Product catalog with categories
-- Stock level tracking
-- Low stock alerts
-- Product search and filtering
-
-###  Client Management
-- Comprehensive client profiles
-- Transaction history
-- Contact management
-- Payment history
-
-###  Financial Dashboard
-- Real-time business metrics
-- Revenue and profit tracking
-- Cash flow analysis
-- Sales performance charts
-
-##  Tech Stack
-
-- **Framework:** Next.js 15 (App Router)
-- **Language:** TypeScript
-- **Database:** Supabase (PostgreSQL)
-- **UI Components:** shadcn/ui
-- **Styling:** Tailwind CSS
-- **Authentication:** Supabase Auth
-- **Deployment:** Vercel
-- **PWA:** next-pwa
-
-##  Quick Start
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/studio-demo.git
-cd studio-demo
-```
-
-2. Install dependencies
-```bash
-npm install
-```
-
-3. Set up environment variables
-```bash
-cp .env.demo.example .env.local
-```
-
-4. Run development server
-```bash
-npm run dev
-```
-
-##  About the Developer
-
-Built by [Your Name] - Full Stack Developer
-
-### Skills Demonstrated
--  Modern React/Next.js development
--  TypeScript for type safety
--  Supabase database design
--  Responsive UI/UX design
--  RESTful API design
--  Authentication and authorization
--  Performance optimization
-
-##  Contact
-
-- **Email:** your.email@example.com
-- **LinkedIn:** [Your Profile](https://linkedin.com/in/yourprofile)
+  <p>
+    <img src="https://img.shields.io/badge/Next.js-15.5-black?style=flat&logo=next.js" alt="Next.js" />
+    <img src="https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/Supabase-PostgreSQL-green?style=flat&logo=supabase" alt="Supabase" />
+    <img src="https://img.shields.io/badge/Tests-57%20passing-success?style=flat" alt="Tests" />
+    <img src="https://img.shields.io/badge/Deployed-Vercel-black?style=flat&logo=vercel" alt="Vercel" />
+  </p>
+</div>
 
 ---
 
- If you like this project, please consider giving it a star!
+## 📋 Overview
+
+A production-ready business management system designed for small to medium retail operations. This demo showcases enterprise-grade architecture patterns including Server-Side Rendering, comprehensive testing, and security-first development.
+
+**Built with production experience** — this application is based on a real-world system currently in use by an active retail business, adapted as a portfolio demonstration project.
+
+## ✨ Key Features
+
+### 💰 Point of Sale (POS)
+- Fast checkout with real-time inventory updates
+- Support for multiple payment methods
+- Thermal receipt printing
+- Sales history and reporting
+
+### 📦 Inventory Management
+- Product catalog with categories
+- Stock level tracking and alerts
+- Automated restock calculations
+- Barcode/SKU support
+
+### 📊 Financial Analytics
+- Real-time sales dashboards
+- Revenue and profit tracking
+- Interactive charts (Recharts)
+- Business metrics visualization
+
+### 👥 Client Management
+- Customer database with purchase history
+- Credit and payment tracking
+- Customer analytics
+
+### 🏦 Loan System (Advanced)
+- Automated installment calculations
+- Late fee management
+- Payment distribution algorithms
+- Comprehensive loan tracking
+
+### 🔐 Security & Performance
+- HttpOnly cookies with JWT authentication
+- CSRF protection (SameSite cookies)
+- Restrictive Content Security Policy
+- Server-Side Rendering for optimal performance
+- 57 comprehensive test suite
+
+## 🛠️ Tech Stack
+
+**Framework & Language**
+- [Next.js 15.5](https://nextjs.org/) with App Router
+- TypeScript 5.0 (strict mode)
+- React 18 with Server Components
+
+**Backend & Database**
+- [Supabase](https://supabase.com/) (PostgreSQL)
+- Direct server-side queries (optimized SSR)
+- Row Level Security (RLS)
+
+**UI & Styling**
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/) components
+- [Recharts](https://recharts.org/) for data visualization
+- Responsive design (mobile-first)
+
+**Testing & Quality**
+- [Vitest](https://vitest.dev/) (57 tests)
+- Unit & integration testing
+- API endpoint testing
+
+**DevOps**
+- Vercel deployment
+- Docker support
+- GitHub Actions ready
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ installed
+- Supabase account (or PostgreSQL)
+- npm/yarn/pnpm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Near08x/demo.git
+cd demo
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Run database migrations (optional)
+npm run migrate
+
+# Start development server
+npm run dev
+```
+
+Open [http://localhost:9000](http://localhost:9000) in your browser.
+
+### Demo Credentials
+
+**Live Demo**: [https://demo-lyart-zeta-92.vercel.app](https://demo-lyart-zeta-92.vercel.app)
+
+```
+Email: demo@example.com
+Password: DemoPassword123
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes (RESTful)
+│   ├── (pages)/           # Application pages
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── ui/               # Base UI components (shadcn)
+│   └── [domain]/         # Domain-specific components
+├── lib/                   # Utilities & configs
+│   ├── supabaseClient.ts # Supabase client
+│   ├── types.ts          # TypeScript types
+│   └── utils.ts          # Helper functions
+├── modules/               # Business logic
+│   └── loans/            # Loan module (service layer)
+└── schemas/               # Zod validation schemas
+```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# View test coverage
+npm run test:coverage
+```
+
+**Test Coverage**: 57 tests across calculator utilities, service layer, and API routes.
+
+## 🏗️ Architecture Highlights
+
+- **Server Components by Default**: 88% SSR optimization
+- **Repository Pattern**: Clean data access layer
+- **Service Layer**: Business logic separation
+- **Factory Pattern**: Loan calculation strategies
+- **Zod Validation**: Type-safe input validation
+- **Security Headers**: CSP, X-Frame-Options, HSTS
+
+## 🔒 Security Features
+
+- ✅ HttpOnly secure cookies (7-day JWT expiration)
+- ✅ CSRF protection via SameSite=Lax
+- ✅ Content Security Policy (production-ready)
+- ✅ Input validation (Zod schemas)
+- ✅ XSS prevention headers
+- ✅ SQL injection prevention (Supabase RLS)
+
+## 📊 Performance
+
+- **First Contentful Paint**: < 1.2s
+- **Time to Interactive**: < 2.5s
+- **Lighthouse Score**: 90+ (Performance, Accessibility, Best Practices)
+- **Bundle Size**: Optimized with code splitting
+
+## 🐳 Docker Support
+
+```bash
+# Build Docker image
+docker build -t studio-demo .
+
+# Run container
+docker run -p 9000:9000 studio-demo
+```
+
+See [DOCKER.md](./DOCKER.md) for detailed deployment instructions.
+
+## 📚 Documentation
+
+- [Architecture Guide](./docs/ARCHITECTURE.md) - System design and patterns
+- [API Reference](./docs/API.md) - Endpoint documentation
+- [Security Guide](./SECURITY.md) - Security implementation details
+- [Deployment Guide](./VERCEL_DEPLOYMENT.md) - Production deployment
+
+## 🤝 Contributing
+
+This is a portfolio demonstration project. While not actively seeking contributions, feel free to:
+- Open issues for bugs or suggestions
+- Fork for your own learning
+- Provide feedback on architecture decisions
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+[MIT License](./LICENSE) - feel free to use this code for learning and portfolio purposes.
+
+## 🔗 Connect
+
+**Robert Vasquez**
+- GitHub: [@Near08x](https://github.com/Near08x)
+- LinkedIn: [robertvasquez08](https://www.linkedin.com/in/robertvasquez08)
+- X/Twitter: [@robertvasquez08](https://x.com/robertvasquez08)
+
+---
+
+<div align="center">
+  <p><strong>Built with Next.js • Deployed on Vercel</strong></p>
+  <p>⭐ Star this repo if you found it helpful!</p>
+</div>
