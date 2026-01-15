@@ -19,14 +19,15 @@ const withBundleAnalyzer = bundleAnalyzer({
 const csp = process.env.NODE_ENV === 'production' 
   ? `
       default-src 'self';
-      script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://vercel.live;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://vercel.live;
       img-src 'self' data: https: blob:;
-      font-src 'self' https://fonts.gstatic.com;
-      connect-src 'self' https://pgslaycjbnijwducaore.supabase.co https://api.supabase.co;
+      font-src 'self' https://fonts.gstatic.com data:;
+      connect-src 'self' https://pgslaycjbnijwducaore.supabase.co https://api.supabase.co https://vercel.live wss://ws-*.pusher.com;
       frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
+      worker-src 'self' blob:;
     `
   : `
       default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
