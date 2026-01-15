@@ -61,7 +61,31 @@ A production-ready business management system designed for small to medium retai
 - Server-Side Rendering for optimal performance
 - 57 comprehensive test suite
 
-## 🛠️ Tech Stack
+## � Screenshots
+
+### Login & Dashboard
+| Login | Dashboard |
+|-------|-----------|
+| ![Login](./docs/screenshots/01-login.png) | ![Dashboard](./docs/screenshots/02-dashboard.png) |
+
+### Point of Sale & Inventory
+| POS Interface | Inventory List |
+|---------------|-----------------|
+| ![POS](./docs/screenshots/03-pos.png) | ![Inventory](./docs/screenshots/04-inventory.png) |
+
+### Inventory & Finance
+| Add Product | Finance Analytics |
+|-------------|-------------------|
+| ![Add Product](./docs/screenshots/05-inventory-add.png) | ![Finance](./docs/screenshots/06-finance-loans.png) |
+
+### Sales Analytics & Loan Management
+| POS/Sales Analytics | Loan Management |
+|--------------------|-----------------| 
+| ![Sales](./docs/screenshots/07-finance-sales.png) | ![Loans](./docs/screenshots/08-loans.png) |
+
+📖 **[View Full Screenshots Gallery](./docs/screenshots/)** for more details and UI components.
+
+---
 
 **Framework & Language**
 - [Next.js 15.5](https://nextjs.org/) with App Router

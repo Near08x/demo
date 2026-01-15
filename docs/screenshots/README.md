@@ -1,23 +1,101 @@
-# Screenshots Placeholder
+# Application Screenshots
 
-Add your application screenshots here for the README.
+Complete visual guide of the Business Management System features.
 
-## Recommended Screenshots:
+## Gallery
 
-1. **dashboard.png** - Main dashboard view showing key metrics
-2. **loans.png** - Loan management interface with list of loans
-3. **pos.png** - Point of sale interface with cart and products
-4. **inventory.png** - Inventory management with product list
-5. **finance.png** - Finance dashboard with charts
-6. **clients.png** - Client management interface
+### Login Screen
+Clean authentication interface with email/password form and security validation.
 
-## How to Take Screenshots:
+### Dashboard
+Main overview with business metrics and quick access to all features.
+- Total Revenue metrics with trends
+- Sales and inventory KPIs
+- Recent Sales widget
+- Recent Clients widget
+- Sidebar navigation
 
-### For Best Results:
-1. Use a consistent browser window size (1920x1080 recommended)
-2. Clear browser zoom (100%)
-3. Use demo data (run `npm run seed-demo` first)
-4. Capture with active/interesting data showing
+### Point of Sale (POS)
+Fast and intuitive checkout interface for retail operations.
+- Product search and filtering
+- Real-time inventory display
+- Stock level indicators
+- Current sale summary
+- Quantity and discount controls
+- Complete Sale functionality
+
+### Inventory Management
+Comprehensive product and stock tracking system.
+- Product catalog with 6+ items
+- Multi-tier pricing (Retail, Wholesale, Sale)
+- Cost tracking and margins
+- Stock level management
+- Status indicators (In Stock, Low Stock)
+- Add/Edit/Delete operations
+- Search and filtering
+
+### Add Product Modal
+User-friendly form for inventory management.
+- Product details (Name, Description)
+- Three pricing tiers
+- Cost and provider information
+- Stock initialization
+- Form validation
+
+### Finance Dashboard - Loans Analytics
+Loan portfolio profitability analysis and management.
+- Total Capital Lent: $200.00
+- Profit Generated: $84.01
+- Receivables tracking: $121.03
+- Overdue monitoring: $0.00
+- Loan Status distribution (pie chart)
+- Top 10 clients by profit margin (bar chart)
+- Download PDF capability
+
+### Finance Dashboard - Sales Analytics
+Revenue, profit, and inventory cost analysis.
+- Total Revenue: $2,879.94
+- Total Profit: $2,674.94
+- Profit Margin: 92.88%
+- Inventory Cost: $49,190.00
+- Tax Collection (ITBIS): $53.39
+- Sales by period trends (bar chart)
+- Spending by provider distribution (pie chart)
+- Period selection and PDF export
+
+### Loan Management
+Detailed loan tracking with installment management.
+- Capital Summary widget
+- Client selection and search
+- Active loan details
+- Installment schedule with columns:
+  - Due Date
+  - Principal amount
+  - Interest portion
+  - Payment status
+  - Late fees
+  - Current status
+- Make Payment button for payments
+- Automatic calculations
+
+## Technical Details
+
+All screenshots demonstrate:
+- **Responsive Design**: Optimized for desktop and tablet
+- **Professional UI**: Clean Tailwind CSS styling with shadcn/ui components
+- **Data Visualization**: Interactive charts using Recharts
+- **User Experience**: Intuitive navigation and clear information hierarchy
+- **Real Demo Data**: Populated with realistic business data
+- **Security**: Secure authentication and role-based access
+
+## Color Scheme
+
+- **Primary**: Deep Blue (#3B82F6) - Buttons, headers, links
+- **Accent**: Teal (#14B8A6) - Charts, highlights
+- **Success**: Green (#10B981) - Positive metrics
+- **Warning**: Red (#EF4444) - Alerts, overdue items
+- **Background**: Light Gray (#F9FAFB) - Page backgrounds
+- **Text**: Dark Gray (#1F2937) - Primary text
 5. Use browser DevTools device emulation for mobile views
 
 ### Tools:
