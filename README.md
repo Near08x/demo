@@ -12,7 +12,16 @@
     <img src="https://img.shields.io/badge/Supabase-PostgreSQL-green?style=flat&logo=supabase" alt="Supabase" />
     <img src="https://img.shields.io/badge/Tests-57%20passing-success?style=flat" alt="Tests" />
     <img src="https://img.shields.io/badge/Deployed-Vercel-black?style=flat&logo=vercel" alt="Vercel" />
+    <img src="https://img.shields.io/badge/Docker-385MB-2496ED?style=flat&logo=docker" alt="Docker" />
   </p>
+
+  ## 🚀 Quick Start
+
+  **Vercel (Live):** https://demo-lyart-zeta-92.vercel.app
+
+  **Docker:** `docker pull near08x/studio-demo:latest`
+  - [View on Docker Hub](https://hub.docker.com/r/near08x/studio-demo)
+  - Tags: `latest`, `v1.0.0`
 </div>
 
 ---
@@ -214,15 +223,24 @@ npm run test:coverage
 
 ## 🐳 Docker Support
 
-```bash
-# Build Docker image
-docker build -t studio-demo .
+The application is containerized and available on Docker Hub.
 
-# Run container
-docker run -p 9000:9000 studio-demo
+```bash
+# Pull from Docker Hub
+docker pull near08x/studio-demo:latest
+
+# Run container (requires Supabase credentials)
+docker run -p 9000:3000 \
+  -e NEXT_PUBLIC_SUPABASE_URL=your_supabase_url \
+  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key \
+  near08x/studio-demo:latest
 ```
 
-See [DOCKER.md](./DOCKER.md) for detailed deployment instructions.
+**Docker Hub:** https://hub.docker.com/r/near08x/studio-demo  
+**Image Size:** 385MB (Alpine-based multi-stage build)
+
+See [DOCKER.md](./DOCKER.md) for detailed deployment instructions and production deployment options (AWS ECS, DigitalOcean, Self-hosted, Docker Compose).
+
 
 ## 📚 Documentation
 
