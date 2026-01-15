@@ -226,7 +226,7 @@ See [DOCKER.md](./DOCKER.md) for detailed deployment instructions.
 
 ## 📚 Documentation
 
-- [Architecture Guide](./docs/ARCHITECTURE.md) - System design and patterns
+- [Architecture Guide](./docs/ARCHITECTURE.md) - System design, patterns, and technical decisions
 - [API Reference](./docs/API.md) - Endpoint documentation
 - [Security Guide](./SECURITY.md) - Security implementation details
 - [Deployment Guide](./VERCEL_DEPLOYMENT.md) - Production deployment
